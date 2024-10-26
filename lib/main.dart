@@ -30,6 +30,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<Offset> _grassPositions = []; // 草の位置を保存するリスト
   List<Widget> _images = [];
+  int _removedImageCount = 0; // 草を食べた回数をカウントする変数
 
   // img.pngのアニメーション用の変数
   double _imgLeftPosition = 0;
@@ -56,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           _images.removeAt(0); // 草の画像を削除
           _grassPositions.removeAt(0); // 草の位置を削除
+          _removedImageCount++; // 草を食べた回数をカウント
         });
         if (_grassPositions.isNotEmpty) {
           _moveImageToNextGrass(); // 次の草があれば、その位置に移動する
@@ -178,6 +180,23 @@ class _MyHomePageState extends State<MyHomePage> {
           Positioned.fill(
             child: Image.asset('assets/background.jpg', fit: BoxFit.cover),
           ),
+
+          // 削除された画像の数を表示するテキスト
+          Positioned(
+            top: 80, // 表示位置を調整
+            left: 0,
+            right: 0,
+            child: Text(
+              '食べたの数: $_removedImageCount',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+
           // 動的に追加された草と花の画像を表示
           ..._images,
 
@@ -189,10 +208,13 @@ class _MyHomePageState extends State<MyHomePage> {
               top: _imgTopPosition,
               left: _imgLeftPosition,
               child: Image.asset(
-                'assets/img.png',
+                _removedImageCount >= 3
+                    ? 'assets/fat_1_1.png'
+                    : 'assets/img.png', // 3回目で画像を変更
                 width: 100,
               ),
             ),
+
           // 画像が追加されていないときのメッセージ
           if (_images.isEmpty)
             const Positioned(
