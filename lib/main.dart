@@ -1,8 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -90,6 +97,22 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // FireStore上にクリックされた画像のカウントを保存する関数
+  Future<void> _incrementCounterInFirestore(
+      String collectionName, String documentId) async {
+    try {
+      final docRef =
+          FirebaseFirestore.instance.collection(collectionName).doc(documentId);
+      await docRef.set(
+        {'value': FieldValue.increment(1)}, // value に1を加算
+        SetOptions(merge: true), // ドキュメントが存在しない場合は新規作成
+      );
+      print("$documentId のカウントが増加しました");
+    } catch (e) {
+      print("Firestoreエラー: $e");
+    }
+  }
+
   // プンプンの画像を追加し、最初のプンプンの草の位置に移動するトリガーを実行
   void _addPunPunImage() {
     setState(() {
@@ -116,6 +139,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       );
+
+      // Firebaseに数字1を保存
+      _incrementCounterInFirestore('counter', 'punpun');
 
       // 初めての草が追加された場合、すぐに画像をその位置に移動させる
       if (_grassPositions.length == 1) {
@@ -153,6 +179,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
 
+      // Firebaseに数字1を保存
+      _incrementCounterInFirestore('counter', 'moyamoya');
+
       // 初めての花が追加された場合、すぐに画像をその位置に移動させる
       if (_grassPositions.length == 1) {
         Future.delayed(const Duration(milliseconds: 200), () {
@@ -188,6 +217,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       );
+
+      // Firebaseに数字1を保存
+      _incrementCounterInFirestore('counter', 'zawazawa');
 
       // 初めての花が追加された場合、すぐに画像をその位置に移動させる
       if (_grassPositions.length == 1) {
@@ -225,6 +257,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
 
+      // Firebaseに数字1を保存
+      _incrementCounterInFirestore('counter', 'mesomeso');
+
       // 初めての花が追加された場合、すぐに画像をその位置に移動させる
       if (_grassPositions.length == 1) {
         Future.delayed(const Duration(milliseconds: 200), () {
@@ -260,6 +295,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       );
+
+      // Firebaseに数字1を保存
+      _incrementCounterInFirestore('counter', 'awaawa');
 
       // 初めての花が追加された場合、すぐに画像をその位置に移動させる
       if (_grassPositions.length == 1) {
