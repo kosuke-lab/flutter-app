@@ -49,63 +49,110 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isImageCentered = true; // 初期状態では画像が中央にある
   bool _isInitialPositionSet = false;
 
+  // 各状態ごとの歩行アニメーション画像リスト
+  final List<String> _normalImages = [
+    'assets/normal_1.png',
+    'assets/normal_2.png',
+    'assets/normal_3.png',
+    'assets/normal_4.png',
+    'assets/normal_5.png',
+  ];
+  final List<String> _slightlyFatImages = [
+    'assets/fat_1_1.png',
+    'assets/fat_1_2.png',
+    'assets/fat_1_3.png',
+  ];
+  final List<String> _moreFatImages = [
+    'assets/fat_2_1.png',
+    'assets/fat_2_2.png',
+    'assets/fat_2_3.png',
+  ];
+  final List<String> _veryFatImages = [
+    'assets/fat_3_1.png',
+    'assets/fat_3_2.png',
+  ];
+
+  List<String> _walkingImages = []; // 現在の状態に応じた画像リスト
+  int _currentWalkingImageIndex = 0;
+  Timer? _walkingAnimationTimer;
+
   @override
   void initState() {
     super.initState();
 
-    // ウィジェットツリーが準備できたら、img.pngの初期位置を設定する
+    // 初期位置設定
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialCenterPosition();
     });
 
-    // 一定時間ごとに草や花の画像を削除し、img.pngを次の位置に移動させる
+    // 草や花を削除してキャラクターを移動させるタイマー
     _removalTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_grassPositions.isNotEmpty) {
         setState(() {
-          _images.removeAt(0); // 草の画像を削除
-          _grassPositions.removeAt(0); // 草の位置を削除
-          _removedImageCount++; // 草を食べた回数をカウント
+          _images.removeAt(0);
+          _grassPositions.removeAt(0);
+          _removedImageCount++;
         });
+        _updateWalkingImages(); // _removedImageCount に基づいて歩行画像を更新
         if (_grassPositions.isNotEmpty) {
-          _moveImageToNextGrass(); // 次の草があれば、その位置に移動する
+          _moveImageToNextGrass();
         }
       }
     });
+
+    // 歩行アニメーションの開始
+    _startWalkingAnimation();
   }
 
-  // img.pngの初期位置を中央に設定する関数
+  // キャラクターの初期位置を中央に設定
   void _setInitialCenterPosition() {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
     setState(() {
-      _imgLeftPosition = (screenWidth - 100) / 2; // 横方向で中央に配置
-      _imgTopPosition = (screenHeight - 100) / 2; // 縦方向で中央に配置
+      _imgLeftPosition = (screenWidth - 100) / 2;
+      _imgTopPosition = (screenHeight - 100) / 2;
       _isInitialPositionSet = true;
     });
   }
 
-  // img.pngを次の草の位置にアニメーションで移動させる関数
+  // _removedImageCount に基づいて _walkingImages を更新
+  void _updateWalkingImages() {
+    setState(() {
+      if (_removedImageCount < 3) {
+        _walkingImages = _normalImages;
+      } else if (_removedImageCount < 10) {
+        _walkingImages = _slightlyFatImages;
+      } else if (_removedImageCount < 20) {
+        _walkingImages = _moreFatImages;
+      } else {
+        _walkingImages = _veryFatImages;
+      }
+      _currentWalkingImageIndex = 0; // 範囲外エラーを避けるためにインデックスをリセット
+    });
+  }
+
+  // 次の草の位置に移動する
   void _moveImageToNextGrass() {
     setState(() {
       if (_grassPositions.isNotEmpty) {
         Offset nextGrassPosition = _grassPositions[0];
         _imgLeftPosition = nextGrassPosition.dx;
         _imgTopPosition = nextGrassPosition.dy;
-        _isImageCentered = false; // 画像が中央から移動した状態
+        _isImageCentered = false;
       }
     });
   }
 
-  // FireStore上にクリックされた画像のカウントを保存する関数
+  // Firestoreにカウントを保存
   Future<void> _incrementCounterInFirestore(
       String collectionName, String documentId) async {
     try {
       final docRef =
           FirebaseFirestore.instance.collection(collectionName).doc(documentId);
       await docRef.set(
-        {'value': FieldValue.increment(1)}, // value に1を加算
-        SetOptions(merge: true), // ドキュメントが存在しない場合は新規作成
+        {'value': FieldValue.increment(1)},
+        SetOptions(merge: true),
       );
       print("$documentId のカウントが増加しました");
     } catch (e) {
@@ -113,208 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // プンプンの画像を追加し、最初のプンプンの草の位置に移動するトリガーを実行
-  void _addPunPunImage() {
-    setState(() {
-      final screenHeight = MediaQuery.of(context).size.height;
-      final screenWidth = MediaQuery.of(context).size.width;
-
-      // 草の画像を画面上にランダムに配置
-      double randomTop = (screenHeight * 0.55) +
-          _random.nextDouble() * (screenHeight * 0.3 - 50);
-      double randomLeft = _random.nextDouble() * (screenWidth - 50);
-
-      Offset newGrassPosition = Offset(randomLeft, randomTop);
-      _grassPositions.add(newGrassPosition);
-
-      // 草の画像をリストに追加
-      _images.add(
-        Positioned(
-          top: randomTop,
-          left: randomLeft,
-          child: Image.asset(
-            'assets/pun-kusa.png',
-            width: 50,
-            height: 50,
-          ),
-        ),
-      );
-
-      // Firebaseに数字1を保存
-      _incrementCounterInFirestore('counter', 'punpun');
-
-      // 初めての草が追加された場合、すぐに画像をその位置に移動させる
-      if (_grassPositions.length == 1) {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _moveImageToNextGrass(); // 最初の草の位置に移動する
-        });
-      }
-    });
-  }
-
-  // モヤモヤの画像を追加し、最初のモヤモヤの位置に移動するトリガーを実行
-  void _addMoyaMoyaImage() {
-    setState(() {
-      final screenHeight = MediaQuery.of(context).size.height;
-      final screenWidth = MediaQuery.of(context).size.width;
-
-      // 花の画像を画面上にランダムに配置
-      double randomTop = (screenHeight * 0.55) +
-          _random.nextDouble() * (screenHeight * 0.3 - 50);
-      double randomLeft = _random.nextDouble() * (screenWidth - 50);
-
-      Offset newGrassPosition = Offset(randomLeft, randomTop);
-      _grassPositions.add(newGrassPosition);
-
-      // 花の画像をリストに追加
-      _images.add(
-        Positioned(
-          top: randomTop,
-          left: randomLeft,
-          child: Image.asset(
-            'assets/moya-kusa.png',
-            width: 50,
-            height: 50,
-          ),
-        ),
-      );
-
-      // Firebaseに数字1を保存
-      _incrementCounterInFirestore('counter', 'moyamoya');
-
-      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
-      if (_grassPositions.length == 1) {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _moveImageToNextGrass(); // 最初の花の位置に移動する
-        });
-      }
-    });
-  }
-
-  // ザワザワの画像を追加し、最初のザワザワの位置に移動するトリガーを実行
-  void _addZawaZawaImage() {
-    setState(() {
-      final screenHeight = MediaQuery.of(context).size.height;
-      final screenWidth = MediaQuery.of(context).size.width;
-
-      // 花の画像を画面上にランダムに配置
-      double randomTop = (screenHeight * 0.55) +
-          _random.nextDouble() * (screenHeight * 0.3 - 50);
-      double randomLeft = _random.nextDouble() * (screenWidth - 50);
-
-      Offset newGrassPosition = Offset(randomLeft, randomTop);
-      _grassPositions.add(newGrassPosition);
-
-      // 花の画像をリストに追加
-      _images.add(
-        Positioned(
-          top: randomTop,
-          left: randomLeft,
-          child: Image.asset(
-            'assets/zawa-kusa.png',
-            width: 50,
-            height: 50,
-          ),
-        ),
-      );
-
-      // Firebaseに数字1を保存
-      _incrementCounterInFirestore('counter', 'zawazawa');
-
-      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
-      if (_grassPositions.length == 1) {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _moveImageToNextGrass(); // 最初の花の位置に移動する
-        });
-      }
-    });
-  }
-
-  // メソメソの画像を追加し、最初のメソメソの位置に移動するトリガーを実行
-  void _addMesomesoImage() {
-    setState(() {
-      final screenHeight = MediaQuery.of(context).size.height;
-      final screenWidth = MediaQuery.of(context).size.width;
-
-      // 花の画像を画面上にランダムに配置
-      double randomTop = (screenHeight * 0.55) +
-          _random.nextDouble() * (screenHeight * 0.3 - 50);
-      double randomLeft = _random.nextDouble() * (screenWidth - 50);
-
-      Offset newGrassPosition = Offset(randomLeft, randomTop);
-      _grassPositions.add(newGrassPosition);
-
-      // 花の画像をリストに追加
-      _images.add(
-        Positioned(
-          top: randomTop,
-          left: randomLeft,
-          child: Image.asset(
-            'assets/meso-kusa.png',
-            width: 50,
-            height: 50,
-          ),
-        ),
-      );
-
-      // Firebaseに数字1を保存
-      _incrementCounterInFirestore('counter', 'mesomeso');
-
-      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
-      if (_grassPositions.length == 1) {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _moveImageToNextGrass(); // 最初の花の位置に移動する
-        });
-      }
-    });
-  }
-
-  // アワアワの画像を追加し、最初のアワアワの位置に移動するトリガーを実行
-  void _addAwaawaImage() {
-    setState(() {
-      final screenHeight = MediaQuery.of(context).size.height;
-      final screenWidth = MediaQuery.of(context).size.width;
-
-      // 花の画像を画面上にランダムに配置
-      double randomTop = (screenHeight * 0.55) +
-          _random.nextDouble() * (screenHeight * 0.3 - 50);
-      double randomLeft = _random.nextDouble() * (screenWidth - 50);
-
-      Offset newGrassPosition = Offset(randomLeft, randomTop);
-      _grassPositions.add(newGrassPosition);
-
-      // 花の画像をリストに追加
-      _images.add(
-        Positioned(
-          top: randomTop,
-          left: randomLeft,
-          child: Image.asset(
-            'assets/awa-kusa.png',
-            width: 50,
-            height: 50,
-          ),
-        ),
-      );
-
-      // Firebaseに数字1を保存
-      _incrementCounterInFirestore('counter', 'awaawa');
-
-      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
-      if (_grassPositions.length == 1) {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _moveImageToNextGrass(); // 最初の花の位置に移動する
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _removalTimer?.cancel(); // メモリリークを防ぐためにタイマーをキャンセル
-    super.dispose();
-  }
-
-// カウントを表示するウィジェットを生成するメソッド
+  // カウントを表示するウィジェット
   Widget _buildCounterDisplay(String documentId) {
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
@@ -322,19 +168,35 @@ class _MyHomePageState extends State<MyHomePage> {
           .doc(documentId)
           .snapshots(),
       builder: (context, snapshot) {
-        // if (snapshot.connectionState == ConnectionState.waiting) {
-        //   return const CircularProgressIndicator(); // ローディングインジケータ
-        // }
         if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Text("0"); // ドキュメントが存在しない場合は0を表示
+          return const Text("0");
         }
         var data = snapshot.data!.data() as Map<String, dynamic>;
         return Text(
-          "${data['value'] ?? 0}", // Firestoreのvalueを表示
+          "${data['value'] ?? 0}",
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         );
       },
     );
+  }
+
+  // 歩行アニメーションを開始する
+  void _startWalkingAnimation() {
+    _updateWalkingImages(); // 正しい初期状態を確認
+    _walkingAnimationTimer =
+        Timer.periodic(const Duration(milliseconds: 200), (timer) {
+      setState(() {
+        _currentWalkingImageIndex =
+            (_currentWalkingImageIndex + 1) % _walkingImages.length;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _removalTimer?.cancel();
+    _walkingAnimationTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -352,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 各カウンターを表示する行
           Positioned(
-            top: 300, // 表示位置を調整
+            top: 300,
             left: 0,
             right: 0,
             child: Row(
@@ -391,9 +253,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
+
           // 削除された画像の数を表示するテキスト
           Positioned(
-            top: 80, // 表示位置を調整
+            top: 80,
             left: 0,
             right: 0,
             child: Text(
@@ -413,19 +276,12 @@ class _MyHomePageState extends State<MyHomePage> {
           // アニメーション付きのimg.png
           if (_isInitialPositionSet)
             AnimatedPositioned(
-              duration: const Duration(seconds: 2), // アニメーションの時間を指定
-              curve: Curves.easeInOut, // アニメーションのカーブを指定
+              duration: const Duration(seconds: 2),
+              curve: Curves.easeInOut,
               top: _imgTopPosition,
               left: _imgLeftPosition,
               child: Image.asset(
-                _removedImageCount >= 0 && _removedImageCount < 3
-                    ? 'assets/normal_1.png' // パターンが0〜2の時
-                    : (_removedImageCount >= 3 && _removedImageCount < 10
-                        ? 'assets/fat_1_1.png' // パターンが3以上10未満の時
-                        : (_removedImageCount >= 10 && _removedImageCount < 20
-                            ? 'assets/fat_2_1.png' // パターンが10以上20未満の時
-                            : 'assets/fat_3_1.png')), // パターンが20以上の時
-
+                _walkingImages[_currentWalkingImageIndex],
                 width: 100,
               ),
             ),
@@ -433,11 +289,11 @@ class _MyHomePageState extends State<MyHomePage> {
           // 画像が追加されていないときのメッセージ
           if (_images.isEmpty)
             const Positioned(
-              top: 150, // テキストの位置を指定
+              top: 150,
               left: 0,
               right: 0,
               child: Text(
-                'いつも頑張って偉いね〜', // コメントの内容
+                'いつも頑張って偉いね〜',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -449,14 +305,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 草や花を追加するためのボタン
           Positioned(
-            top: 20, // 上からの距離
+            top: 20,
             left: 0,
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 InkWell(
-                  onTap: _addPunPunImage,
+                  onTap: () {
+                    _addPunPunImage();
+                    _incrementCounterInFirestore('counter', 'punpun');
+                  },
                   child: Image.asset(
                     'assets/punpun.png',
                     width: 50,
@@ -464,7 +323,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 InkWell(
-                  onTap: _addMoyaMoyaImage,
+                  onTap: () {
+                    _addMoyaMoyaImage();
+                    _incrementCounterInFirestore('counter', 'moyamoya');
+                  },
                   child: Image.asset(
                     'assets/moyaamoyaa.png',
                     width: 50,
@@ -472,7 +334,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 InkWell(
-                  onTap: _addZawaZawaImage,
+                  onTap: () {
+                    _addZawaZawaImage();
+                    _incrementCounterInFirestore('counter', 'zawazawa');
+                  },
                   child: Image.asset(
                     'assets/zawazawa.png',
                     width: 50,
@@ -480,7 +345,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 InkWell(
-                  onTap: _addMesomesoImage,
+                  onTap: () {
+                    _addMesomesoImage();
+                    _incrementCounterInFirestore('counter', 'mesomeso');
+                  },
                   child: Image.asset(
                     'assets/mesomeso.png',
                     width: 50,
@@ -488,7 +356,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 InkWell(
-                  onTap: _addAwaawaImage,
+                  onTap: () {
+                    _addAwaawaImage();
+                    _incrementCounterInFirestore('counter', 'awaawa');
+                  },
                   child: Image.asset(
                     'assets/awaawa.png',
                     width: 50,
@@ -501,5 +372,59 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
+  }
+
+  // 各花や草の画像を追加する関数
+  void _addPunPunImage() {
+    _addImage('assets/pun-kusa.png', 'punpun');
+  }
+
+  void _addMoyaMoyaImage() {
+    _addImage('assets/moya-kusa.png', 'moyamoya');
+  }
+
+  void _addZawaZawaImage() {
+    _addImage('assets/zawa-kusa.png', 'zawazawa');
+  }
+
+  void _addMesomesoImage() {
+    _addImage('assets/meso-kusa.png', 'mesomeso');
+  }
+
+  void _addAwaawaImage() {
+    _addImage('assets/awa-kusa.png', 'awaawa');
+  }
+
+  // 画像を追加して位置を設定する共通メソッド
+  void _addImage(String assetPath, String documentId) {
+    setState(() {
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+
+      double randomTop = (screenHeight * 0.55) +
+          _random.nextDouble() * (screenHeight * 0.3 - 50);
+      double randomLeft = _random.nextDouble() * (screenWidth - 50);
+
+      Offset newGrassPosition = Offset(randomLeft, randomTop);
+      _grassPositions.add(newGrassPosition);
+
+      _images.add(
+        Positioned(
+          top: randomTop,
+          left: randomLeft,
+          child: Image.asset(
+            assetPath,
+            width: 50,
+            height: 50,
+          ),
+        ),
+      );
+
+      if (_grassPositions.length == 1) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          _moveImageToNextGrass();
+        });
+      }
+    });
   }
 }
