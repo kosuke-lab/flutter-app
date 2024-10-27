@@ -90,8 +90,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // 草の画像を追加し、最初の草の位置に移動するトリガーを実行
-  void _addFirstImage() {
+  // プンプンの画像を追加し、最初のプンプンの草の位置に移動するトリガーを実行
+  void _addPunPunImage() {
     setState(() {
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
           top: randomTop,
           left: randomLeft,
           child: Image.asset(
-            'assets/grass.png',
+            'assets/pun-kusa.png',
             width: 50,
             height: 50,
           ),
@@ -126,8 +126,8 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // 花の画像を追加し、最初の花の位置に移動するトリガーを実行
-  void _addSecondImage() {
+  // モヤモヤの画像を追加し、最初のモヤモヤの位置に移動するトリガーを実行
+  void _addMoyaMoyaImage() {
     setState(() {
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
@@ -146,7 +146,115 @@ class _MyHomePageState extends State<MyHomePage> {
           top: randomTop,
           left: randomLeft,
           child: Image.asset(
-            'assets/flower.png',
+            'assets/moya-kusa.png',
+            width: 50,
+            height: 50,
+          ),
+        ),
+      );
+
+      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
+      if (_grassPositions.length == 1) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          _moveImageToNextGrass(); // 最初の花の位置に移動する
+        });
+      }
+    });
+  }
+
+  // ザワザワの画像を追加し、最初のザワザワの位置に移動するトリガーを実行
+  void _addZawaZawaImage() {
+    setState(() {
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+
+      // 花の画像を画面上にランダムに配置
+      double randomTop = (screenHeight * 0.55) +
+          _random.nextDouble() * (screenHeight * 0.3 - 50);
+      double randomLeft = _random.nextDouble() * (screenWidth - 50);
+
+      Offset newGrassPosition = Offset(randomLeft, randomTop);
+      _grassPositions.add(newGrassPosition);
+
+      // 花の画像をリストに追加
+      _images.add(
+        Positioned(
+          top: randomTop,
+          left: randomLeft,
+          child: Image.asset(
+            'assets/zawa-kusa.png',
+            width: 50,
+            height: 50,
+          ),
+        ),
+      );
+
+      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
+      if (_grassPositions.length == 1) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          _moveImageToNextGrass(); // 最初の花の位置に移動する
+        });
+      }
+    });
+  }
+
+  // メソメソの画像を追加し、最初のメソメソの位置に移動するトリガーを実行
+  void _addMesomesoImage() {
+    setState(() {
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+
+      // 花の画像を画面上にランダムに配置
+      double randomTop = (screenHeight * 0.55) +
+          _random.nextDouble() * (screenHeight * 0.3 - 50);
+      double randomLeft = _random.nextDouble() * (screenWidth - 50);
+
+      Offset newGrassPosition = Offset(randomLeft, randomTop);
+      _grassPositions.add(newGrassPosition);
+
+      // 花の画像をリストに追加
+      _images.add(
+        Positioned(
+          top: randomTop,
+          left: randomLeft,
+          child: Image.asset(
+            'assets/meso-kusa.png',
+            width: 50,
+            height: 50,
+          ),
+        ),
+      );
+
+      // 初めての花が追加された場合、すぐに画像をその位置に移動させる
+      if (_grassPositions.length == 1) {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          _moveImageToNextGrass(); // 最初の花の位置に移動する
+        });
+      }
+    });
+  }
+
+  // アワアワの画像を追加し、最初のアワアワの位置に移動するトリガーを実行
+  void _addAwaawaImage() {
+    setState(() {
+      final screenHeight = MediaQuery.of(context).size.height;
+      final screenWidth = MediaQuery.of(context).size.width;
+
+      // 花の画像を画面上にランダムに配置
+      double randomTop = (screenHeight * 0.55) +
+          _random.nextDouble() * (screenHeight * 0.3 - 50);
+      double randomLeft = _random.nextDouble() * (screenWidth - 50);
+
+      Offset newGrassPosition = Offset(randomLeft, randomTop);
+      _grassPositions.add(newGrassPosition);
+
+      // 花の画像をリストに追加
+      _images.add(
+        Positioned(
+          top: randomTop,
+          left: randomLeft,
+          child: Image.asset(
+            'assets/awa-kusa.png',
             width: 50,
             height: 50,
           ),
@@ -240,14 +348,45 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton.icon(
-                  onPressed: _addFirstImage,
-                  label: const Text('怒り'),
+                InkWell(
+                  onTap: _addPunPunImage,
+                  child: Image.asset(
+                    'assets/punpun.png',
+                    width: 50,
+                    height: 50,
+                  ),
                 ),
-                const SizedBox(width: 20),
-                ElevatedButton.icon(
-                  onPressed: _addSecondImage,
-                  label: const Text('悲しみ'),
+                InkWell(
+                  onTap: _addMoyaMoyaImage,
+                  child: Image.asset(
+                    'assets/moyaamoyaa.png',
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+                InkWell(
+                  onTap: _addZawaZawaImage,
+                  child: Image.asset(
+                    'assets/zawazawa.png',
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+                InkWell(
+                  onTap: _addMesomesoImage,
+                  child: Image.asset(
+                    'assets/mesomeso.png',
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+                InkWell(
+                  onTap: _addAwaawaImage,
+                  child: Image.asset(
+                    'assets/awaawa.png',
+                    width: 50,
+                    height: 50,
+                  ),
                 ),
               ],
             ),
