@@ -69,7 +69,10 @@ flutter:
     - assets/meso-kusa.png
     - assets/awaawa.png
     - assets/awa-kusa.png
+    - assets/normal_1.png
     - assets/fat_1_1.png
+    - assets/fat_2_1.png
+    - assets/fat_3_1.png
     - assets/sample.jpg
     - assets/img.png
     - assets/grass.png
