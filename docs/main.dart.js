@@ -52047,18 +52047,22 @@ JR(){this.an(new A.ZC(this))},
 l(){var s=this.y
 if(s!=null)s.aQ()
 this.aD()},
-O(a){var s,r,q,p,o,n,m=this,l=null
-m.a.toString
-s=A.a8o("Image Add on Click Demo",l,l)
+O(a){var s,r,q,p,o,n,m,l=this,k=null
+l.a.toString
+s=A.a8o("Image Add on Click Demo",k,k)
 r=t.nA
-q=A.a([A.a7B(0,A.eG("assets/background.jpg",B.ui,l,l)),A.hy(l,A.a8o("\u98df\u3079\u305f\u306e\u6570: "+m.f,B.Fp,B.cE),l,l,0,0,80,l)],r)
-p=m.e
+q=A.a([A.a7B(0,A.eG("assets/background.jpg",B.ui,k,k)),A.hy(k,A.a8o("\u98df\u3079\u305f\u8349\u306e\u6570: "+l.f,B.Fp,B.cE),k,k,0,0,80,k)],r)
+p=l.e
 B.b.H(q,p)
-if(m.Q){o=m.w
-n=m.r
-q.push(new A.nW(A.eG(m.f>=3?"assets/fat_1_1.png":"assets/img.png",l,l,100),n,o,B.ig,B.eU,l,l))}if(p.length===0)q.push(B.CH)
-q.push(A.hy(l,A.ahg(A.a([A.pI(!1,!0,A.eG("assets/punpun.png",l,50,50),l,!0,l,l,l,l,l,l,l,l,l,m.gK1(),l,l,l,l),A.pI(!1,!0,A.eG("assets/moyaamoyaa.png",l,50,50),l,!0,l,l,l,l,l,l,l,l,l,m.gK_(),l,l,l,l),A.pI(!1,!0,A.eG("assets/zawazawa.png",l,50,50),l,!0,l,l,l,l,l,l,l,l,l,m.gK6(),l,l,l,l),A.pI(!1,!0,A.eG("assets/mesomeso.png",l,50,50),l,!0,l,l,l,l,l,l,l,l,l,m.gJY(),l,l,l,l),A.pI(!1,!0,A.eG("assets/awaawa.png",l,50,50),l,!0,l,l,l,l,l,l,l,l,l,m.gJQ(),l,l,l,l)],r),B.c5,B.nD,B.nE),l,l,0,0,20,l))
-return new A.r9(new A.o5(s,new A.Fe(l,l,1/0,56),l),A.UX(B.ef,q,B.h2),l)}}
+if(l.Q){o=l.w
+n=l.r
+m=l.f
+if(m<3)m="assets/normal_1.png"
+else if(m>=3&&m<10)m="assets/fat_1_1.png"
+else m=m>=10&&m<20?"assets/fat_2_1.png":"assets/fat_3_1.png"
+q.push(new A.nW(A.eG(m,k,k,100),n,o,B.ig,B.eU,k,k))}if(p.length===0)q.push(B.CH)
+q.push(A.hy(k,A.ahg(A.a([A.pI(!1,!0,A.eG("assets/punpun.png",k,50,50),k,!0,k,k,k,k,k,k,k,k,k,l.gK1(),k,k,k,k),A.pI(!1,!0,A.eG("assets/moyaamoyaa.png",k,50,50),k,!0,k,k,k,k,k,k,k,k,k,l.gK_(),k,k,k,k),A.pI(!1,!0,A.eG("assets/zawazawa.png",k,50,50),k,!0,k,k,k,k,k,k,k,k,k,l.gK6(),k,k,k,k),A.pI(!1,!0,A.eG("assets/mesomeso.png",k,50,50),k,!0,k,k,k,k,k,k,k,k,k,l.gJY(),k,k,k,k),A.pI(!1,!0,A.eG("assets/awaawa.png",k,50,50),k,!0,k,k,k,k,k,k,k,k,k,l.gJQ(),k,k,k,k)],r),B.c5,B.nD,B.nE),k,k,0,0,20,k))
+return new A.r9(new A.o5(s,new A.Fe(k,k,1/0,56),k),A.UX(B.ef,q,B.h2),k)}}
 A.ZO.prototype={
 $1(a){this.a.Qj()},
 $S:5}
