@@ -295,7 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
             left: 0,
             right: 0,
             child: Text(
-              '食べたの数: $_removedImageCount',
+              '食べた草の数: $_removedImageCount',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
@@ -316,9 +316,14 @@ class _MyHomePageState extends State<MyHomePage> {
               top: _imgTopPosition,
               left: _imgLeftPosition,
               child: Image.asset(
-                _removedImageCount >= 3
-                    ? 'assets/fat_1_1.png'
-                    : 'assets/img.png', // 3回目で画像を変更
+                _removedImageCount >= 0 && _removedImageCount < 3
+                    ? 'assets/normal_1.png' // パターンが0〜2の時
+                    : (_removedImageCount >= 3 && _removedImageCount < 10
+                        ? 'assets/fat_1_1.png' // パターンが3以上10未満の時
+                        : (_removedImageCount >= 10 && _removedImageCount < 20
+                            ? 'assets/fat_2_1.png' // パターンが10以上20未満の時
+                            : 'assets/fat_3_1.png')), // パターンが20以上の時
+
                 width: 100,
               ),
             ),
