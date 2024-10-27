@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final Random _random = Random();
 
   Timer? _removalTimer;
+  Timer? _timeCheckTimer; // 15時になったら変更するためのタイマー
 
   bool _isImageCentered = true; // 初期状態では画像が中央にある
   bool _isInitialPositionSet = false;
@@ -71,6 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
     'assets/fat_3_1.png',
     'assets/fat_3_2.png',
   ];
+  final List<String> _dietImages = [
+    'assets/jump_1.png',
+    'assets/jump_2.png',
+  ];
 
   List<String> _walkingImages = []; // 現在の状態に応じた画像リスト
   int _currentWalkingImageIndex = 0;
@@ -86,22 +91,13 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     // 草や花を削除してキャラクターを移動させるタイマー
-    _removalTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_grassPositions.isNotEmpty) {
-        setState(() {
-          _images.removeAt(0);
-          _grassPositions.removeAt(0);
-          _removedImageCount++;
-        });
-        _updateWalkingImages(); // _removedImageCount に基づいて歩行画像を更新
-        if (_grassPositions.isNotEmpty) {
-          _moveImageToNextGrass();
-        }
-      }
-    });
+    _startRemovalTimer();
 
     // 歩行アニメーションの開始
     _startWalkingAnimation();
+
+    // 毎分時間をチェックして15時になったら画像を変更するタイマー
+    _startTimeCheckTimer();
   }
 
   // キャラクターの初期位置を中央に設定
@@ -192,10 +188,43 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // 毎分時間をチェックして15時になったら画像を変更するタイマー
+  void _startTimeCheckTimer() {
+    _timeCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      final currentTime = DateTime.now();
+      if (currentTime.hour == 15 &&
+          currentTime.minute == 00 &&
+          _removedImageCount > 19) {
+        setState(() {
+          _walkingImages = _dietImages;
+          _currentWalkingImageIndex = 0; // インデックスをリセット
+        });
+      }
+    });
+  }
+
+  // 草や花を削除してキャラクターを移動させるタイマー
+  void _startRemovalTimer() {
+    _removalTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_grassPositions.isNotEmpty) {
+        setState(() {
+          _images.removeAt(0);
+          _grassPositions.removeAt(0);
+          _removedImageCount++;
+        });
+        _updateWalkingImages();
+        if (_grassPositions.isNotEmpty) {
+          _moveImageToNextGrass();
+        }
+      }
+    });
+  }
+
   @override
   void dispose() {
     _removalTimer?.cancel();
     _walkingAnimationTimer?.cancel();
+    _timeCheckTimer?.cancel(); // タイムチェックタイマーをキャンセル
     super.dispose();
   }
 
