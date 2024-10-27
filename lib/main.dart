@@ -161,24 +161,24 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   // カウントを表示するウィジェット
-  Widget _buildCounterDisplay(String documentId) {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('counter')
-          .doc(documentId)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Text("0");
-        }
-        var data = snapshot.data!.data() as Map<String, dynamic>;
-        return Text(
-          "${data['value'] ?? 0}",
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        );
-      },
-    );
-  }
+  // Widget _buildCounterDisplay(String documentId) {
+  //   return StreamBuilder<DocumentSnapshot>(
+  //     stream: FirebaseFirestore.instance
+  //         .collection('counter')
+  //         .doc(documentId)
+  //         .snapshots(),
+  //     builder: (context, snapshot) {
+  //       if (!snapshot.hasData || !snapshot.data!.exists) {
+  //         return const Text("0");
+  //       }
+  //       var data = snapshot.data!.data() as Map<String, dynamic>;
+  //       return Text(
+  //         "${data['value'] ?? 0}",
+  //         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //       );
+  //     },
+  //   );
+  // }
 
   // 歩行アニメーションを開始する
   void _startWalkingAnimation() {
@@ -219,38 +219,38 @@ class _MyHomePageState extends State<MyHomePage> {
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Column(
-                  children: [
-                    _buildCounterDisplay('punpun'),
-                    const Text('プンプン'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _buildCounterDisplay('moyamoya'),
-                    const Text('モヤモヤ'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _buildCounterDisplay('zawazawa'),
-                    const Text('ザワザワ'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _buildCounterDisplay('mesomeso'),
-                    const Text('メソメソ'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    _buildCounterDisplay('awaawa'),
-                    const Text('アワアワ'),
-                  ],
-                ),
-              ],
+              // children: [
+              //   Column(
+              //     children: [
+              //       _buildCounterDisplay('punpun'),
+              //       const Text('プンプン'),
+              //     ],
+              //   ),
+              //   Column(
+              //     children: [
+              //       _buildCounterDisplay('moyamoya'),
+              //       const Text('モヤモヤ'),
+              //     ],
+              //   ),
+              //   Column(
+              //     children: [
+              //       _buildCounterDisplay('zawazawa'),
+              //       const Text('ザワザワ'),
+              //     ],
+              //   ),
+              //   Column(
+              //     children: [
+              //       _buildCounterDisplay('mesomeso'),
+              //       const Text('メソメソ'),
+              //     ],
+              //   ),
+              //   Column(
+              //     children: [
+              //       _buildCounterDisplay('awaawa'),
+              //       const Text('アワアワ'),
+              //     ],
+              //   ),
+              // ],
             ),
           ),
 
