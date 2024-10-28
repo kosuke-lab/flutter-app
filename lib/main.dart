@@ -20,7 +20,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Image Test',
-      home: const MyHomePage(title: 'Image Add on Click Demo'),
+      home: const MyHomePage(title: ''),
+      debugShowCheckedModeBanner: true,
     );
   }
 }
@@ -270,14 +271,36 @@ class _MyHomePageState extends State<MyHomePage> {
   void _startTimeCheckTimer() {
     _timeCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       final currentTime = DateTime.now();
-      if (currentTime.hour == 15 &&
-          currentTime.minute == 00 &&
-          _removedImageCount > 19) {
+      if (currentTime.hour == 15 && currentTime.minute == 00) {
         setState(() {
           _walkingImages = _dietImages;
           _currentWalkingImageIndex = 0; // インデックスをリセット
         });
+
+        _backupAndDeleteCollection(); // バックアップを作成し、元のコレクションを削除
       }
+    });
+  }
+
+  // 15時時点のデータをバックアップして元のコレクションを削除
+  void _backupAndDeleteCollection() {
+    final newCollectionName = '${DateTime.now().toString()}';
+    FirebaseFirestore.instance
+        .collection('counter')
+        .get()
+        .then((snapshot) async {
+      for (DocumentSnapshot doc in snapshot.docs) {
+        // 新しいコレクションに同じデータを追加
+        await FirebaseFirestore.instance
+            .collection(newCollectionName)
+            .doc(doc.id) // 同じIDで保存
+            .set(doc.data() as Map<String, dynamic>);
+        // 元のコレクションから削除
+        await doc.reference.delete();
+      }
+      print('バックアップを作成し、元のコレクションを削除しました');
+    }).catchError((error) {
+      print('バックアップ作成中または削除中にエラーが発生しました: $error');
     });
   }
 
@@ -313,9 +336,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Stack(
         children: [
           // 背景画像
@@ -374,10 +394,9 @@ class _MyHomePageState extends State<MyHomePage> {
               '食べた草の数: $_removedImageCount',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
           ),
 
@@ -409,7 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ),
