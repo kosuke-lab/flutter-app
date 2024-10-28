@@ -76,6 +76,22 @@ class _MyHomePageState extends State<MyHomePage> {
     'assets/jump_1.png',
     'assets/jump_2.png',
   ];
+  // 下記から食べてる時の画像
+  final List<String> _nomalEatImages = [
+    'assets/eat_1.png',
+    'assets/eat_2.png',
+  ];
+  final List<String> _slightlyFatEatImages = [
+    'assets/fat_1_4.png',
+  ];
+  final List<String> _moreFatEatImages = [
+    'assets/fat_2_4.png',
+    'assets/fat_2_5.png',
+  ];
+  // final List<String> _veryFatEatImages = [
+  //   'assets/fat_3_1.png',
+  //   'assets/fat_3_2.png',
+  // ];
 
   List<String> _walkingImages = []; // 現在の状態に応じた画像リスト
   int _currentWalkingImageIndex = 0;
@@ -107,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _imgLeftPosition = (screenWidth - 100) / 2;
-      _imgTopPosition = (screenHeight - 100) / 2;
+      _imgTopPosition = (screenHeight - 100) / 1.5;
       _isInitialPositionSet = true;
     });
   }
@@ -137,6 +153,27 @@ class _MyHomePageState extends State<MyHomePage> {
         _imgTopPosition = nextGrassPosition.dy;
         _isImageCentered = false;
       }
+    });
+
+    // キャラクターが到達後に一時的に食べてる画像に変更
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        if (_removedImageCount < 3) {
+          _walkingImages = _nomalEatImages;
+        } else if (_removedImageCount < 10) {
+          _walkingImages = _slightlyFatEatImages;
+        } else if (_removedImageCount < 20) {
+          _walkingImages = _moreFatEatImages;
+        }
+        _currentWalkingImageIndex = 0;
+      });
+
+      // 1秒後に通常の歩行アニメーションに戻す
+      Future.delayed(const Duration(seconds: 1), () {
+        setState(() {
+          _updateWalkingImages(); // `_removedImageCount`に基づいてリストを更新
+        });
+      });
     });
   }
 
@@ -205,7 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 草や花を削除してキャラクターを移動させるタイマー
   void _startRemovalTimer() {
-    _removalTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _removalTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_grassPositions.isNotEmpty) {
         setState(() {
           _images.removeAt(0);
@@ -238,7 +275,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           // 背景画像
           Positioned.fill(
-            child: Image.asset('assets/background.jpg', fit: BoxFit.cover),
+            child: Image.asset('assets/haikei.png', fit: BoxFit.cover),
           ),
 
           // 各カウンターを表示する行
