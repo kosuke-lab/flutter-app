@@ -50,6 +50,47 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isImageCentered = true; // 初期状態では画像が中央にある
   bool _isInitialPositionSet = false;
 
+// メッセージ候補リスト
+  final List<String> messages = [
+    '無理しないでね​',
+    '大変そうだね​',
+    '僕は青じそドレッシングが好きだよ​',
+    '僕はクォッカ、コアラには負けない！​',
+    'まだまだ食べるよ！​',
+    '僕たちクォッカは "世界一幸せな動物" って呼ばれてるんだよ！',
+    '美味しいものでも食べて元気出そう！​',
+    '少し休んでもいいんだよ​',
+    'いつでも話を聞くよ​',
+    'いつも頑張りを見てるよ、偉いね​',
+    '今日は早く帰ろうね​',
+    '焦らずゆっくりで大丈夫だよ​',
+    '話してくれてありがとう！​',
+    '（たまには焼肉も食べたい）​',
+    '不機嫌おいしい〜​',
+    '会社来てるだけで君はなんて偉いんだ​',
+    'チョコでも食べたら？​',
+    '桃の香りでリラックスできるらしいよ〜​',
+    'ちょっと窓から外を見てみよう！​',
+    '不機嫌の草は0カロリーだ!',
+    '君がいてくれるだけで安心するよ​',
+    'もぐもぐむしゃむしゃ​',
+    'ニガっ！！！​',
+    'おかわり欲しいな〜​',
+    'はぁ〜美味しかった!',
+  ];
+
+  // メッセージを1回だけ表示するためのフラグ
+  bool _showMessageOnce = true;
+  // 現在のメッセージを保持する変数
+  String? _currentMessage; // 現在のメッセージを保持する変数
+
+// ランダムにメッセージを選ぶ
+  String getRandomMessage() {
+    final random = Random();
+    _showMessageOnce = false; // メッセージを表示した後にフラグをオフにする
+    return messages[random.nextInt(messages.length)];
+  }
+
   // 各状態ごとの歩行アニメーション画像リスト
   final List<String> _normalImages = [
     'assets/normal_1.png',
@@ -248,6 +289,17 @@ class _MyHomePageState extends State<MyHomePage> {
           _images.removeAt(0);
           _grassPositions.removeAt(0);
           _removedImageCount++;
+
+          //  草を食べた後にメッセージを表示
+          _currentMessage = getRandomMessage();
+          _showMessageOnce = true;
+
+          //  2秒後メッセージを非表示にする
+          Future.delayed(const Duration(seconds: 10), () {
+            setState(() {
+              _showMessageOnce = false;
+            });
+          });
         });
         _updateWalkingImages();
         if (_grassPositions.isNotEmpty) {
@@ -353,13 +405,13 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
           // 画像が追加されていないときのメッセージ
-          if (_images.isEmpty)
-            const Positioned(
+          if (_showMessageOnce && _currentMessage != null)
+            Positioned(
               top: 150,
               left: 0,
               right: 0,
               child: Text(
-                'いつも頑張って偉いね〜',
+                _currentMessage!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
