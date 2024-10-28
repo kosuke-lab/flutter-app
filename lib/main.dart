@@ -283,7 +283,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 草や花を削除してキャラクターを移動させるタイマー
   void _startRemovalTimer() {
-    _removalTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+    _removalTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_grassPositions.isNotEmpty) {
         setState(() {
           _images.removeAt(0);
@@ -293,13 +293,6 @@ class _MyHomePageState extends State<MyHomePage> {
           //  草を食べた後にメッセージを表示
           _currentMessage = getRandomMessage();
           _showMessageOnce = true;
-
-          //  2秒後メッセージを非表示にする
-          Future.delayed(const Duration(seconds: 10), () {
-            setState(() {
-              _showMessageOnce = false;
-            });
-          });
         });
         _updateWalkingImages();
         if (_grassPositions.isNotEmpty) {
@@ -404,7 +397,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
 
-          // 画像が追加されていないときのメッセージ
+          // クリックされたときに表示されるメッセージ
           if (_showMessageOnce && _currentMessage != null)
             Positioned(
               top: 150,
