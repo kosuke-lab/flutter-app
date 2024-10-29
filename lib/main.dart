@@ -1,8 +1,10 @@
+import 'dart:html' as html;
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -51,6 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isImageCentered = true; // 初期状態では画像が中央にある
   bool _isInitialPositionSet = false;
 
+  // 許可されたUUIDをリストで定義
+  static const List<String> authorizedUuids = [
+    "961c178b-a298-4d6f-aff4-7c4c945d470a", // local用
+    "c8ba7cf1-b0f6-4753-9039-9694e02946c9", // local用
+  ];
+
 // メッセージ候補リスト
   final List<String> messages = [
     '無理しないでね​',
@@ -82,8 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // メッセージを1回だけ表示するためのフラグ
   bool _showMessageOnce = true;
+
   // 現在のメッセージを保持する変数
-  String? _currentMessage; // 現在のメッセージを保持する変数
+  String? _currentMessage;
+
+  // UUIDが一致する場合にtrueになるフラグ
+  bool _isAdmin = false;
 
 // ランダムにメッセージを選ぶ
   String getRandomMessage() {
@@ -135,6 +147,37 @@ class _MyHomePageState extends State<MyHomePage> {
   //   'assets/fat_3_2.png',
   // ];
 
+  // ハードコードされたUUIDとの一致を確認し、メッセージを表示
+  Future<void> checkAndShowMessage() async {
+    String uuid = await getOrCreateUuid();
+    if (authorizedUuids.contains(uuid)) {
+      // UUIDが一致する場合のみメッセージを表示
+      setState(() {
+        _isAdmin = true;
+      });
+    }
+  }
+
+  // 初回アクセス時にUUIDを生成し、localStorageとFirestoreに保存
+  Future<String> getOrCreateUuid() async {
+    const uuidKey = 'flutter_web_unique_id';
+    var storedUuid = html.window.localStorage[uuidKey];
+
+    if (storedUuid == null) {
+      // UUIDを生成し、localStorageとFirestoreに保存
+      storedUuid = Uuid().v4();
+      html.window.localStorage[uuidKey] = storedUuid;
+      await FirebaseFirestore.instance
+          .collection('userUuids')
+          .doc(storedUuid)
+          .set({
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
+
+    return storedUuid;
+  }
+
   List<String> _walkingImages = []; // 現在の状態に応じた画像リスト
   int _currentWalkingImageIndex = 0;
   Timer? _walkingAnimationTimer;
@@ -142,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    checkAndShowMessage(); // UUIDをチェックしてメッセージ表示を確認
 
     // 初期位置設定
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -350,6 +394,11 @@ class _MyHomePageState extends State<MyHomePage> {
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: _isAdmin
+                  ? [
+                      const Text('管理者専用のメッセージ'),
+                    ]
+                  : [],
               // children: [
               //   Column(
               //     children: [
