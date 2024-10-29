@@ -57,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<String> authorizedUuids = [
     "961c178b-a298-4d6f-aff4-7c4c945d470a", // local用
     "c8ba7cf1-b0f6-4753-9039-9694e02946c9", // local用
+    "68fc11a3-9a3f-4092-9fb3-15dcf3e65945" // iPhone用 MK
   ];
 
 // メッセージ候補リスト
