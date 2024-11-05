@@ -65,7 +65,7 @@ flutter:
     - assets/haikei.png
     - assets/punpun.png
     - assets/pun-kusa.png
-    - assets/moyaamoyaa.png
+    - assets/moyamoya.png
     - assets/moya-kusa.png
     - assets/zawazawa.png
     - assets/zawa-kusa.png
@@ -97,6 +97,7 @@ flutter:
     - assets/img.png
     - assets/grass.png
     - assets/flower.png
+    - assets/title.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
