@@ -52266,7 +52266,7 @@ n=s.x
 p.push(new A.oR(A.j2(s.id[s.k1],r,r,100),n,o,B.hX,B.bQ,r,r))}p.push(A.Cw(B.cr,s.e,B.dC))
 if(s.ch&&s.CW!=null){o=s.CW
 o.toString
-p.push(A.jp(r,A.a6d(o,A.nA(r,r,B.m,r,r,r,r,r,r,r,r,18,r,r,B.bR,r,r,!0,r,r,r,r,r,r,r,r),B.bt),r,r,0,0,150,r))}p.push(A.jp(30,A.aaV(A.a([A.zH(!1,!0,A.j2("assets/punpun.png",r,75,80),r,!0,r,r,r,r,r,r,r,r,r,new A.a1f(s),r),A.zH(!1,!0,A.j2("assets/moyamoya.png",r,75,80),r,!0,r,r,r,r,r,r,r,r,r,new A.a1g(s),r),A.zH(!1,!0,A.j2("assets/zawazawa.png",r,75,80),r,!0,r,r,r,r,r,r,r,r,r,new A.a1h(s),r),A.zH(!1,!0,A.j2("assets/mesomeso.png",r,75,80),r,!0,r,r,r,r,r,r,r,r,r,new A.a1i(s),r),A.zH(!1,!0,A.j2("assets/awaawa.png",r,75,80),r,!0,r,r,r,r,r,r,r,r,r,new A.a1j(s),r)],m),B.nu,B.eP),r,r,0,0,r,r))
+p.push(A.jp(r,A.a6d(o,A.nA(r,r,B.m,r,r,r,r,r,r,r,r,18,r,r,B.bR,r,r,!0,r,r,r,r,r,r,r,r),B.bt),r,r,0,0,150,r))}p.push(A.jp(30,A.aaV(A.a([A.zH(!1,!0,A.j2("assets/punpun.png",r,75,75),r,!0,r,r,r,r,r,r,r,r,r,new A.a1f(s),r),A.zH(!1,!0,A.j2("assets/moyamoya.png",r,75,75),r,!0,r,r,r,r,r,r,r,r,r,new A.a1g(s),r),A.zH(!1,!0,A.j2("assets/zawazawa.png",r,75,75),r,!0,r,r,r,r,r,r,r,r,r,new A.a1h(s),r),A.zH(!1,!0,A.j2("assets/mesomeso.png",r,75,75),r,!0,r,r,r,r,r,r,r,r,r,new A.a1i(s),r),A.zH(!1,!0,A.j2("assets/awaawa.png",r,75,75),r,!0,r,r,r,r,r,r,r,r,r,new A.a1j(s),r)],m),B.nu,B.eP),r,r,0,0,r,r))
 return new A.tg(A.Cw(B.cr,p,B.dC),r)},
 kG(a,b){this.ai(new A.a0V(this,a))}}
 A.a1k.prototype={
