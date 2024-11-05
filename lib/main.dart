@@ -598,7 +598,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/punpun.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -609,7 +609,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/moyamoya.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -620,7 +620,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/zawazawa.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -631,7 +631,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/mesomeso.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -642,7 +642,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/awaawa.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
