@@ -41,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Offset> _grassPositions = []; // 草の位置を保存するリスト
   List<Widget> _images = [];
   int _removedImageCount = 0; // 草を食べた回数をカウントする変数
+  double _titleImageOpacity = 1.0; // 初期値を1.0に設定（表示状態）
 
   // img.pngのアニメーション用の変数
   double _imgLeftPosition = 0;
@@ -187,6 +188,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     checkAndShowMessage(); // UUIDをチェックしてメッセージ表示を確認
+
+    // 2秒後にフェードアウトするようにタイマーを設定
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _titleImageOpacity = 0.0;
+      });
+    });
 
     // 初期位置設定
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -380,12 +388,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // PC と SP で画像のサイズを分ける
+    final titleImageSize =
+        screenWidth > 600 ? 700.0 : 500.0; // 600以上ならPC、以下ならSP
+
     return Scaffold(
       body: Stack(
         children: [
           // 背景画像
           Positioned.fill(
             child: Image.asset('assets/haikei.png', fit: BoxFit.cover),
+          ),
+
+          Align(
+            alignment: Alignment.topCenter,
+            child: AnimatedOpacity(
+              opacity: _titleImageOpacity,
+              duration: const Duration(seconds: 1), // フェードアウトの長さ
+              child: Image.asset(
+                'assets/title.png',
+                height: 500,
+                width: titleImageSize,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
 
           // 各カウンターを表示する行
@@ -485,7 +513,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 草や花を追加するためのボタン
           Positioned(
-            top: 20,
+            bottom: 30,
             left: 0,
             right: 0,
             child: Row(
@@ -498,8 +526,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/punpun.png',
-                    width: 50,
-                    height: 50,
+                    width: 90, // サイズを100ピクセルに拡大
+                    height: 80,
                   ),
                 ),
                 InkWell(
@@ -508,9 +536,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     _incrementCounterInFirestore('counter', 'moyamoya');
                   },
                   child: Image.asset(
-                    'assets/moyaamoyaa.png',
-                    width: 50,
-                    height: 50,
+                    'assets/moyamoya.png',
+                    width: 90, // サイズを100ピクセルに拡大
+                    height: 80,
                   ),
                 ),
                 InkWell(
@@ -520,8 +548,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/zawazawa.png',
-                    width: 50,
-                    height: 50,
+                    width: 90, // サイズを100ピクセルに拡大
+                    height: 80,
                   ),
                 ),
                 InkWell(
@@ -531,8 +559,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/mesomeso.png',
-                    width: 50,
-                    height: 50,
+                    width: 90, // サイズを100ピクセルに拡大
+                    height: 80,
                   ),
                 ),
                 InkWell(
@@ -542,8 +570,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/awaawa.png',
-                    width: 50,
-                    height: 50,
+                    width: 90, // サイズを100ピクセルに拡大
+                    height: 80,
                   ),
                 ),
               ],
