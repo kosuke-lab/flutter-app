@@ -534,8 +534,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/punpun.png',
-                    width: 90, // サイズを100ピクセルに拡大
-                    height: 80,
+                    width: 80, // サイズを100ピクセルに拡大
+                    height: 75,
                   ),
                 ),
                 InkWell(
@@ -545,8 +545,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/moyamoya.png',
-                    width: 90, // サイズを100ピクセルに拡大
-                    height: 80,
+                    width: 80, // サイズを100ピクセルに拡大
+                    height: 75,
                   ),
                 ),
                 InkWell(
@@ -556,8 +556,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/zawazawa.png',
-                    width: 90, // サイズを100ピクセルに拡大
-                    height: 80,
+                    width: 80, // サイズを100ピクセルに拡大
+                    height: 75,
                   ),
                 ),
                 InkWell(
@@ -567,8 +567,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/mesomeso.png',
-                    width: 90, // サイズを100ピクセルに拡大
-                    height: 80,
+                    width: 80, // サイズを100ピクセルに拡大
+                    height: 75,
                   ),
                 ),
                 InkWell(
@@ -578,8 +578,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/awaawa.png',
-                    width: 90, // サイズを100ピクセルに拡大
-                    height: 80,
+                    width: 80, // サイズを100ピクセルに拡大
+                    height: 75,
                   ),
                 ),
               ],
