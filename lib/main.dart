@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> _images = [];
   int _removedImageCount = 0; // 草を食べた回数をカウントする変数
   double _titleImageOpacity = 1.0; // 初期値を1.0に設定（表示状態）
+  String? _showTimeMessage; // 15時になったら表示するメッセージ
 
   // img.pngのアニメーション用の変数
   double _imgLeftPosition = 0;
@@ -144,10 +146,6 @@ class _MyHomePageState extends State<MyHomePage> {
     'assets/fat_2_4.png',
     'assets/fat_2_5.png',
   ];
-  // final List<String> _veryFatEatImages = [
-  //   'assets/fat_3_1.png',
-  //   'assets/fat_3_2.png',
-  // ];
 
   // ハードコードされたUUIDとの一致を確認し、メッセージを表示
   Future<void> checkAndShowMessage() async {
@@ -206,6 +204,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // 歩行アニメーションの開始
     _startWalkingAnimation();
+
+    // ローカルストレージから15時メッセージの表示状況をチェック
+    _checkLocalTimeAndSetMessage();
 
     // 毎分時間をチェックして15時になったら画像を変更するタイマー
     _startTimeCheckTimer();
@@ -320,16 +321,62 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // ユーザーそれぞれで15時になったらメッセージを表示するための処理
+  // SharedPreferencesで日付を確認し、今日15時以降ならメッセージを表示
+  Future<void> _checkLocalTimeAndSetMessage() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lastShownDateStr = prefs.getString('lastShownDate');
+
+    if (lastShownDateStr != null) {
+      // 表示日が記録されている場合
+      final lastShownDate = DateTime.parse(lastShownDateStr);
+      final lastShownDay =
+          DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
+
+      if (lastShownDay != today && now.hour >= 15) {
+        // 今日まだ表示されていない場合にメッセージを表示
+        setState(() {
+          _showTimeMessage = "＼ リセット！リセット ／";
+          _walkingImages = _dietImages;
+          _currentWalkingImageIndex = 0; // インデックスをリセット
+        });
+
+        await prefs.setString('lastShownDate', today.toIso8601String());
+        // 45秒後に元の画像リストに戻す
+        Future.delayed(const Duration(seconds: 45), () {
+          setState(() {
+            _updateWalkingImages(); // ここで通常の画像リストに戻す
+          });
+        });
+      }
+    } else {
+      // 初回アクセスの場合
+      if (now.hour >= 15) {
+        setState(() {
+          _showTimeMessage = "＼ リセット！リセット ／";
+          _walkingImages = _dietImages;
+          _currentWalkingImageIndex = 0; // インデックスをリセット
+        });
+        await prefs.setString('lastShownDate', today.toIso8601String());
+      }
+
+      // 45秒後に元の画像リストに戻す
+      Future.delayed(const Duration(seconds: 45), () {
+        setState(() {
+          _updateWalkingImages(); // ここで通常の画像リストに戻す
+        });
+      });
+    }
+  }
+
   // 毎分時間をチェックして15時になったら画像を変更するタイマー
   void _startTimeCheckTimer() {
     _timeCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
       final currentTime = DateTime.now();
       if (currentTime.hour == 15 && currentTime.minute == 00) {
-        setState(() {
-          _walkingImages = _dietImages;
-          _currentWalkingImageIndex = 0; // インデックスをリセット
-        });
-
         _backupAndDeleteCollection(); // バックアップを作成し、元のコレクションを削除
       }
     });
@@ -483,6 +530,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.white),
             ),
           ),
+
+          //  15時になったら表示するメッセージ
+          if (_showTimeMessage != null)
+            Positioned(
+              top: 150,
+              left: 0,
+              right: 0,
+              child: Text(
+                _showTimeMessage!,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
 
           // アニメーション付きのimg.png
           if (_isInitialPositionSet)
