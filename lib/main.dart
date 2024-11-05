@@ -657,6 +657,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 各花や草の画像を追加する関数
   void _addPunPunImage() {
     _addImage('assets/pun-kusa.png', 'punpun');
+    print('aaa');
   }
 
   void _addMoyaMoyaImage() {
