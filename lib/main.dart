@@ -244,8 +244,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       if (_grassPositions.isNotEmpty) {
         Offset nextGrassPosition = _grassPositions[0];
-        _imgLeftPosition = nextGrassPosition.dx;
-        _imgTopPosition = nextGrassPosition.dy;
+        _imgLeftPosition = nextGrassPosition.dx - 12; // 草の中央に合わせて調整
+        _imgTopPosition = nextGrassPosition.dy - 18; // 草の高さに合わせて調整
         _isImageCentered = false;
       }
     });
@@ -367,8 +367,14 @@ class _MyHomePageState extends State<MyHomePage> {
           _removedImageCount++;
 
           //  草を食べた後にメッセージを表示
-          _currentMessage = getRandomMessage();
-          _showMessageOnce = true;
+          if (_removedImageCount > 19) {
+            // 20回以上食べたらメッセージを固定
+            _currentMessage = '15時くらい運動しようかな〜';
+            _showMessageOnce = true;
+          } else {
+            _currentMessage = getRandomMessage();
+            _showMessageOnce = true;
+          }
         });
         _updateWalkingImages();
         if (_grassPositions.isNotEmpty) {
@@ -478,9 +484,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // 動的に追加された草と花の画像を表示
-          ..._images,
-
           // アニメーション付きのimg.png
           if (_isInitialPositionSet)
             AnimatedPositioned(
@@ -493,6 +496,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 width: 100,
               ),
             ),
+
+          // 動的に追加された草と花の画像を表示
+          Stack(
+            children: _images,
+          ),
 
           // クリックされたときに表示されるメッセージ
           if (_showMessageOnce && _currentMessage != null)
