@@ -58,9 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 許可されたUUIDをリストで定義
   static const List<String> authorizedUuids = [
-    "961c178b-a298-4d6f-aff4-7c4c945d470a", // local用
-    "c8ba7cf1-b0f6-4753-9039-9694e02946c9", // local用
-    "68fc11a3-9a3f-4092-9fb3-15dcf3e65945" // iPhone用 MK
+    "bb4a5169-9a03-4445-9c65-aa205fce8e34", // Prod松井
   ];
 
 // メッセージ候補リスト
@@ -150,12 +148,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // ハードコードされたUUIDとの一致を確認し、メッセージを表示
   Future<void> checkAndShowMessage() async {
     String uuid = await getOrCreateUuid();
-    if (authorizedUuids.contains(uuid)) {
-      // UUIDが一致する場合のみメッセージを表示
-      setState(() {
-        _isAdmin = true;
-      });
-    }
+    setState(() {
+      _isAdmin = authorizedUuids.contains(uuid);
+    });
   }
 
   // 初回アクセス時にUUIDを生成し、localStorageとFirestoreに保存
@@ -661,7 +656,6 @@ class _MyHomePageState extends State<MyHomePage> {
   // 各花や草の画像を追加する関数
   void _addPunPunImage() {
     _addImage('assets/pun-kusa.png', 'punpun');
-    print('aaa');
   }
 
   void _addMoyaMoyaImage() {
