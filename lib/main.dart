@@ -510,7 +510,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 各カウンターを表示する行
           Positioned(
-            top: 630,
+            top: 580,
             left: 0,
             right: 0,
             child: Row(
