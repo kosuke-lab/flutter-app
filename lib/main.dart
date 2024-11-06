@@ -327,8 +327,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? lastShownDateStr = prefs.getString('lastShownDate');
+    // localStorageから最後に表示した日付を取得
+    String? lastShownDateStr = html.window.localStorage['lastShownDate'];
 
     if (lastShownDateStr != null) {
       // 表示日が記録されている場合
@@ -344,7 +344,9 @@ class _MyHomePageState extends State<MyHomePage> {
           _currentWalkingImageIndex = 0; // インデックスをリセット
         });
 
-        await prefs.setString('lastShownDate', today.toIso8601String());
+        // 今日の日付を保存
+        html.window.localStorage['lastShownDate'] = today.toIso8601String();
+
         // 45秒後に元の画像リストに戻す
         Future.delayed(const Duration(seconds: 45), () {
           setState(() {
@@ -360,15 +362,17 @@ class _MyHomePageState extends State<MyHomePage> {
           _walkingImages = _dietImages;
           _currentWalkingImageIndex = 0; // インデックスをリセット
         });
-        await prefs.setString('lastShownDate', today.toIso8601String());
-      }
 
-      // 45秒後に元の画像リストに戻す
-      Future.delayed(const Duration(seconds: 45), () {
-        setState(() {
-          _updateWalkingImages(); // ここで通常の画像リストに戻す
+        // 今日の日付を保存
+        html.window.localStorage['lastShownDate'] = today.toIso8601String();
+
+        // 45秒後に元の画像リストに戻す
+        Future.delayed(const Duration(seconds: 45), () {
+          setState(() {
+            _updateWalkingImages(); // ここで通常の画像リストに戻す
+          });
         });
-      });
+      }
     }
   }
 
@@ -598,7 +602,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/punpun.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -609,7 +613,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/moyamoya.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -620,7 +624,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/zawazawa.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -631,7 +635,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/mesomeso.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -642,7 +646,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Image.asset(
                     'assets/awaawa.png',
-                    width: 80, // サイズを100ピクセルに拡大
+                    width: 75, // サイズを100ピクセルに拡大
                     height: 75,
                   ),
                 ),
@@ -657,6 +661,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 各花や草の画像を追加する関数
   void _addPunPunImage() {
     _addImage('assets/pun-kusa.png', 'punpun');
+    print('aaa');
   }
 
   void _addMoyaMoyaImage() {
