@@ -52379,7 +52379,7 @@ r=s.cx
 if(r!=null)r.aL(0)
 s.aP()},
 V(a){var s=this,r=null,q=A.cV(a,r,t.w).w.a.a>600?700:500,p=A.akw(0,A.j7("assets/haikei.png",B.ue,r,r)),o=s.as,n=A.j7("assets/title.png",B.ud,500,q),m=t.eE
-p=A.a([p,new A.xk(B.u_,r,r,new A.oS(n,o,B.a0,B.cS,r,r),r),A.jv(r,A.aaV(s.fx?A.a([A.yb(A.a([A.lD(""+s.e,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Ix],m)),A.yb(A.a([A.lD(""+s.f,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iv],m)),A.yb(A.a([A.lD(""+s.r,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iy],m)),A.yb(A.a([A.lD(""+s.w,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iw],m)),A.yb(A.a([A.lD(""+s.x,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iu],m))],m):A.a([],m),B.ny,B.dd),r,r,0,0,630,r),A.jv(r,A.lD("\u98df\u3079\u305f\u8349\u306e\u6570: "+s.Q,B.G2,B.bv),r,r,0,0,80,r)],m)
+p=A.a([p,new A.xk(B.u_,r,r,new A.oS(n,o,B.a0,B.cS,r,r),r),A.jv(r,A.aaV(s.fx?A.a([A.yb(A.a([A.lD(""+s.e,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Ix],m)),A.yb(A.a([A.lD(""+s.f,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iv],m)),A.yb(A.a([A.lD(""+s.r,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iy],m)),A.yb(A.a([A.lD(""+s.w,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iw],m)),A.yb(A.a([A.lD(""+s.x,A.fw(r,r,r,r,r,r,r,r,r,r,r,20,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),r),B.Iu],m))],m):A.a([],m),B.ny,B.dd),r,r,0,0,580,r),A.jv(r,A.lD("\u98df\u3079\u305f\u8349\u306e\u6570: "+s.Q,B.G2,B.bv),r,r,0,0,80,r)],m)
 o=s.at
 if(o!=null)p.push(A.jv(r,A.lD(o,A.fw(r,r,B.m,r,r,r,r,r,r,r,r,18,r,r,B.a9,r,r,!0,r,r,r,r,r,r,r,r),B.bv),r,r,0,0,150,r))
 if(s.db){o=s.ay
