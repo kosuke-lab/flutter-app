@@ -6,7 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'firebase_options.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +38,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Timer? _hourlyDataFetchTimer;
+  // Firestoreから取得したカウントを保持する変数
+  int punpunCount = 0;
+  int moyamoyaCount = 0;
+  int zawazawaCount = 0;
+  int mesomesoCount = 0;
+  int awaawaCount = 0;
+
   List<Offset> _grassPositions = []; // 草の位置を保存するリスト
   List<Widget> _images = [];
   int _removedImageCount = 0; // 草を食べた回数をカウントする変数
@@ -59,9 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
   // 許可されたUUIDをリストで定義
   static const List<String> authorizedUuids = [
     "bb4a5169-9a03-4445-9c65-aa205fce8e34", // Prod松井
+    "8f35bdd9-3ac0-430c-90a7-67918d8b3413", // local松井
   ];
 
-// メッセージ候補リスト
+  // メッセージ候補リスト
   final List<String> messages = [
     '無理しないでね​',
     '大変そうだね​',
@@ -99,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // UUIDが一致する場合にtrueになるフラグ
   bool _isAdmin = false;
 
-// ランダムにメッセージを選ぶ
+  // ランダムにメッセージを選ぶ
   String getRandomMessage() {
     final random = Random();
     _showMessageOnce = false; // メッセージを表示した後にフラグをオフにする
@@ -132,6 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
     'assets/jump_1.png',
     'assets/jump_2.png',
   ];
+
   // 下記から食べてる時の画像
   final List<String> _nomalEatImages = [
     'assets/eat_1.png',
@@ -189,6 +198,9 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
 
+    // 初回データ取得
+    _fetchDataFromFirestore();
+
     // 初期位置設定
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setInitialCenterPosition();
@@ -205,6 +217,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // 毎分時間をチェックして15時になったら画像を変更するタイマー
     _startTimeCheckTimer();
+
+    // 1時間ごとにデータを取得するタイマーを開始
+    _startHourlyDataFetchTimer();
+  }
+
+  // 1時間ごとにFirestoreの値を取得
+  void _startHourlyDataFetchTimer() {
+    _hourlyDataFetchTimer = Timer.periodic(const Duration(hours: 1), (timer) {
+      _fetchDataFromFirestore();
+    });
   }
 
   // キャラクターの初期位置を中央に設定
@@ -284,25 +306,42 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // カウントを表示するウィジェット
-  // Widget _buildCounterDisplay(String documentId) {
-  //   return StreamBuilder<DocumentSnapshot>(
-  //     stream: FirebaseFirestore.instance
-  //         .collection('counter')
-  //         .doc(documentId)
-  //         .snapshots(),
-  //     builder: (context, snapshot) {
-  //       if (!snapshot.hasData || !snapshot.data!.exists) {
-  //         return const Text("0");
-  //       }
-  //       var data = snapshot.data!.data() as Map<String, dynamic>;
-  //       return Text(
-  //         "${data['value'] ?? 0}",
-  //         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-  //       );
-  //     },
-  //   );
-  // }
+// Firestoreからデータを取得するメソッド
+  Future<void> _fetchDataFromFirestore() async {
+    try {
+      // 各ドキュメントからカウントを取得し、それぞれの状態変数に保存
+      final punpunSnapshot = await FirebaseFirestore.instance
+          .collection('counter')
+          .doc('punpun')
+          .get();
+      final moyamoyaSnapshot = await FirebaseFirestore.instance
+          .collection('counter')
+          .doc('moyamoya')
+          .get();
+      final zawazawaSnapshot = await FirebaseFirestore.instance
+          .collection('counter')
+          .doc('zawazawa')
+          .get();
+      final mesomesoSnapshot = await FirebaseFirestore.instance
+          .collection('counter')
+          .doc('mesomeso')
+          .get();
+      final awaawaSnapshot = await FirebaseFirestore.instance
+          .collection('counter')
+          .doc('awaawa')
+          .get();
+
+      setState(() {
+        punpunCount = punpunSnapshot.data()?['value'] ?? 0;
+        moyamoyaCount = moyamoyaSnapshot.data()?['value'] ?? 0;
+        zawazawaCount = zawazawaSnapshot.data()?['value'] ?? 0;
+        mesomesoCount = mesomesoSnapshot.data()?['value'] ?? 0;
+        awaawaCount = awaawaSnapshot.data()?['value'] ?? 0;
+      });
+    } catch (e) {
+      print("Firestore error: $e");
+    }
+  }
 
   // 歩行アニメーションを開始する
   void _startWalkingAnimation() {
@@ -412,7 +451,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _grassPositions.removeAt(0);
           _removedImageCount++;
 
-          //  草を食べた後にメッセージを表示
+          // 草を食べた後にメッセージを表示
           if (_removedImageCount > 19) {
             // 20回以上食べたらメッセージを固定
             _currentMessage = '15時くらい運動しようかな〜';
@@ -432,6 +471,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    _hourlyDataFetchTimer?.cancel(); // タイマーを停止
     _removalTimer?.cancel();
     _walkingAnimationTimer?.cancel();
     _timeCheckTimer?.cancel(); // タイムチェックタイマーをキャンセル
@@ -470,48 +510,55 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 各カウンターを表示する行
           Positioned(
-            top: 300,
+            top: 630,
             left: 0,
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: _isAdmin
                   ? [
-                      const Text('管理者専用のメッセージ'),
+                      Column(
+                        children: [
+                          Text('$punpunCount',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('プンプン'),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text('$moyamoyaCount',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('モヤモヤ'),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text('$zawazawaCount',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('ザワザワ'),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text('$mesomesoCount',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('メソメソ'),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text('$awaawaCount',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Text('アワアワ'),
+                        ],
+                      ),
                     ]
                   : [],
-              // children: [
-              //   Column(
-              //     children: [
-              //       _buildCounterDisplay('punpun'),
-              //       const Text('プンプン'),
-              //     ],
-              //   ),
-              //   Column(
-              //     children: [
-              //       _buildCounterDisplay('moyamoya'),
-              //       const Text('モヤモヤ'),
-              //     ],
-              //   ),
-              //   Column(
-              //     children: [
-              //       _buildCounterDisplay('zawazawa'),
-              //       const Text('ザワザワ'),
-              //     ],
-              //   ),
-              //   Column(
-              //     children: [
-              //       _buildCounterDisplay('mesomeso'),
-              //       const Text('メソメソ'),
-              //     ],
-              //   ),
-              //   Column(
-              //     children: [
-              //       _buildCounterDisplay('awaawa'),
-              //       const Text('アワアワ'),
-              //     ],
-              //   ),
-              // ],
             ),
           ),
 
