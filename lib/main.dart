@@ -67,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<String> authorizedUuids = [
     "bb4a5169-9a03-4445-9c65-aa205fce8e34", // Prod松井
     "8f35bdd9-3ac0-430c-90a7-67918d8b3413", // local松井
+    "580ddbbe-06db-4543-b5ba-f6bbff75b231",
   ];
 
   // メッセージ候補リスト
@@ -215,9 +216,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // ローカルストレージから15時メッセージの表示状況をチェック
     _checkLocalTimeAndSetMessage();
 
-    // 毎分時間をチェックして15時になったら画像を変更するタイマー
-    _startTimeCheckTimer();
-
     // 1時間ごとにデータを取得するタイマーを開始
     _startHourlyDataFetchTimer();
   }
@@ -297,7 +295,10 @@ class _MyHomePageState extends State<MyHomePage> {
       final docRef =
           FirebaseFirestore.instance.collection(collectionName).doc(documentId);
       await docRef.set(
-        {'value': FieldValue.increment(1)},
+        {
+          'value': FieldValue.increment(1),
+          'updatedAt': FieldValue.serverTimestamp(),
+        },
         SetOptions(merge: true),
       );
       print("$documentId のカウントが増加しました");
@@ -308,26 +309,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
 // Firestoreからデータを取得するメソッド
   Future<void> _fetchDataFromFirestore() async {
+    final now = DateTime.now();
+    final isAfterThreePM = now.hour >= 15;
+
+    // 使用するコレクション名を条件に基づいて決定
+    final collectionName = isAfterThreePM
+        ? '${now.year}-${now.month}-${now.day}-15:00:00'
+        : 'counter';
+
     try {
       // 各ドキュメントからカウントを取得し、それぞれの状態変数に保存
       final punpunSnapshot = await FirebaseFirestore.instance
-          .collection('counter')
+          .collection(collectionName)
           .doc('punpun')
           .get();
       final moyamoyaSnapshot = await FirebaseFirestore.instance
-          .collection('counter')
+          .collection(collectionName)
           .doc('moyamoya')
           .get();
       final zawazawaSnapshot = await FirebaseFirestore.instance
-          .collection('counter')
+          .collection(collectionName)
           .doc('zawazawa')
           .get();
       final mesomesoSnapshot = await FirebaseFirestore.instance
-          .collection('counter')
+          .collection(collectionName)
           .doc('mesomeso')
           .get();
       final awaawaSnapshot = await FirebaseFirestore.instance
-          .collection('counter')
+          .collection(collectionName)
           .doc('awaawa')
           .get();
 
@@ -381,6 +390,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // 今日の日付を保存
         html.window.localStorage['lastShownDate'] = today.toIso8601String();
 
+        // バックアップと削除の処理をここで実行
+        _backupAndDeleteCollection();
+
         // 45秒後に元の画像リストに戻す
         Future.delayed(const Duration(seconds: 45), () {
           setState(() {
@@ -400,6 +412,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // 今日の日付を保存
         html.window.localStorage['lastShownDate'] = today.toIso8601String();
 
+        // バックアップと削除の処理をここで実行
+        _backupAndDeleteCollection();
+
         // 45秒後に元の画像リストに戻す
         Future.delayed(const Duration(seconds: 45), () {
           setState(() {
@@ -410,33 +425,46 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // 毎分時間をチェックして15時になったら画像を変更するタイマー
-  void _startTimeCheckTimer() {
-    _timeCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      final currentTime = DateTime.now();
-      if (currentTime.hour == 15 && currentTime.minute == 00) {
-        _backupAndDeleteCollection(); // バックアップを作成し、元のコレクションを削除
-      }
-    });
-  }
-
   // 15時時点のデータをバックアップして元のコレクションを削除
-  void _backupAndDeleteCollection() {
-    final newCollectionName = '${DateTime.now().toString()}';
+  void _backupAndDeleteCollection() async {
+    // バックアップコレクション名を当日の15時に固定
+    final backupTimestamp = DateTime.now();
+    final backupCollectionName =
+        '${backupTimestamp.year}-${backupTimestamp.month}-${backupTimestamp.day}-15:00:00';
+
+    // コレクションがすでに存在するかチェック
+    final backupCollectionSnapshot = await FirebaseFirestore.instance
+        .collection(backupCollectionName)
+        .limit(1)
+        .get();
+
+    if (backupCollectionSnapshot.docs.isNotEmpty) {
+      print('バックアップはすでに存在します。処理を終了します。');
+      return;
+    }
+
     FirebaseFirestore.instance
         .collection('counter')
+        .where('updatedAt',
+            isLessThanOrEqualTo:
+                Timestamp.fromDate(DateTime.now())) // 15時以前のデータのみ
         .get()
         .then((snapshot) async {
       for (DocumentSnapshot doc in snapshot.docs) {
-        // 新しいコレクションに同じデータを追加
+        // 新しいコレクションにデータとバックアップタイムスタンプを追加
         await FirebaseFirestore.instance
-            .collection(newCollectionName)
-            .doc(doc.id) // 同じIDで保存
-            .set(doc.data() as Map<String, dynamic>);
+            .collection(backupCollectionName)
+            .doc(doc.id)
+            .set({
+          'value': doc['value'],
+          'updatedAt': doc['updatedAt'],
+          'backupTimestamp':
+              FieldValue.serverTimestamp(), // バックアップ実行時のタイムスタンプを保存
+        });
         // 元のコレクションから削除
         await doc.reference.delete();
       }
-      print('バックアップを作成し、元のコレクションを削除しました');
+      print('15時以前のデータをバックアップし、元のコレクションから削除しました');
     }).catchError((error) {
       print('バックアップ作成中または削除中にエラーが発生しました: $error');
     });
@@ -510,7 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 各カウンターを表示する行
           Positioned(
-            top: 580,
+            bottom: 110,
             left: 0,
             right: 0,
             child: Row(
