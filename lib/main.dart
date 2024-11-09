@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<String> authorizedUuids = [
     "bb4a5169-9a03-4445-9c65-aa205fce8e34", // Prod松井
     "8f35bdd9-3ac0-430c-90a7-67918d8b3413", // local松井
-    "580ddbbe-06db-4543-b5ba-f6bbff75b231",
+    "13cbb0b4-7749-4cc3-a0ed-b967536cb624", // 谷上
   ];
 
   // メッセージ候補リスト
@@ -746,9 +746,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
           // 15時になったら45秒だけ表示するメッセージと不機嫌総数
-          if (_showBackupData)
+          // 管理者以外に表示する
+          if (_showBackupData && !_isAdmin)
             Positioned(
-              top: 150,
+              bottom: 110,
               left: 0,
               right: 0,
               child: Column(
