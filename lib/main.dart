@@ -142,6 +142,11 @@ class _MyHomePageState extends State<MyHomePage> {
     'assets/jump_2.png',
   ];
 
+  final List<String> _slimImages = [
+    'assets/slim_1.png',
+    'assets/slim_2.png',
+  ];
+
   // 下記から食べてる時の画像
   final List<String> _nomalEatImages = [
     'assets/eat_1.png',
@@ -379,7 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final lastShownDay =
           DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
 
-      if (lastShownDay != today && now.hour >= 15) {
+      if (lastShownDay != today && now.hour >= 0) {
         // 今日まだ表示されていない場合にメッセージを表示
         setState(() {
           _showTimeMessage = "＼ リセット！リセット ／";
@@ -393,16 +398,25 @@ class _MyHomePageState extends State<MyHomePage> {
         // バックアップと削除の処理をここで実行
         _backupAndDeleteCollection();
 
-        // 45秒後に元の画像リストに戻す
-        Future.delayed(const Duration(seconds: 45), () {
+        // 45秒後に痩せてる画像に変更
+        Future.delayed(const Duration(seconds: 5), () {
           setState(() {
-            _updateWalkingImages(); // ここで通常の画像リストに戻す
+            _walkingImages = _slimImages;
+          });
+
+          // さらに15秒後にを実行
+          Future.delayed(const Duration(seconds: 15), () {
+            setState(() {
+              _removedImageCount = 0; // カウントをリセット
+              _updateWalkingImages(); // 通常の画像リストに戻す
+              _showTimeMessage = "＼ お腹空いた〜！ ／";
+            });
           });
         });
       }
     } else {
       // 初回アクセスの場合
-      if (now.hour >= 15) {
+      if (now.hour >= 0) {
         setState(() {
           _showTimeMessage = "＼ リセット！リセット ／";
           _walkingImages = _dietImages;
@@ -416,9 +430,18 @@ class _MyHomePageState extends State<MyHomePage> {
         _backupAndDeleteCollection();
 
         // 45秒後に元の画像リストに戻す
-        Future.delayed(const Duration(seconds: 45), () {
+        Future.delayed(const Duration(seconds: 5), () {
           setState(() {
-            _updateWalkingImages(); // ここで通常の画像リストに戻す
+            _walkingImages = _slimImages;
+          });
+
+          // さらに15秒後にを実行
+          Future.delayed(const Duration(seconds: 15), () {
+            setState(() {
+              _removedImageCount = 0; // カウントをリセット
+              _updateWalkingImages(); // 通常の画像リストに戻す
+              _showTimeMessage = "＼ お腹空いた〜！ ／";
+            });
           });
         });
       }

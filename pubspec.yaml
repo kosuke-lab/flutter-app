@@ -92,6 +92,8 @@ flutter:
     - assets/fat_2_5.png
     - assets/fat_3_1.png
     - assets/fat_3_2.png
+    - assets/slim_1.png
+    - assets/slim_2.png
     - assets/jump_1.png
     - assets/jump_2.png
     - assets/sample.jpg
