@@ -440,7 +440,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _backupAndDeleteCollection();
 
         // 45秒後に元の画像リストに戻す
-        Future.delayed(const Duration(seconds: 5), () {
+        Future.delayed(const Duration(seconds: 45), () {
           setState(() {
             _walkingImages = _slimImages;
           });
