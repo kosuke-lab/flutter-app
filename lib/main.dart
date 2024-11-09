@@ -39,12 +39,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Timer? _hourlyDataFetchTimer;
-  // Firestoreから取得したカウントを保持する変数
+  // Firestoreから取得した管理者のカウントを保持する変数
+  int adminPunpunCount = 0;
+  int adminMoyamoyaCount = 0;
+  int adminZawazawaCount = 0;
+  int adminMesomesoCount = 0;
+  int adminAwaawaCount = 0;
+
+  // Firestoreから取得したユーザーのカウントを保持する変数
   int punpunCount = 0;
   int moyamoyaCount = 0;
   int zawazawaCount = 0;
   int mesomesoCount = 0;
   int awaawaCount = 0;
+
+  // バックアップを表示するかどうかのフラグ
+  bool _showBackupData = false;
 
   List<Offset> _grassPositions = []; // 草の位置を保存するリスト
   List<Widget> _images = [];
@@ -72,31 +82,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // メッセージ候補リスト
   final List<String> messages = [
-    '無理しないでね​',
-    '大変そうだね​',
-    '僕は青じそドレッシングが好きだよ​',
-    '僕はクォッカ、コアラには負けない！​',
-    'まだまだ食べるよ！​',
-    '僕たちクォッカは "世界一幸せな動物" って呼ばれてるんだよ！',
-    '美味しいものでも食べて元気出そう！​',
-    '少し休んでもいいんだよ​',
-    'いつでも話を聞くよ​',
-    'いつも頑張りを見てるよ、偉いね​',
-    '今日は早く帰ろうね​',
-    '焦らずゆっくりで大丈夫だよ​',
-    '話してくれてありがとう！​',
-    '（たまには焼肉も食べたい）​',
-    '不機嫌おいしい〜​',
-    '会社来てるだけで君はなんて偉いんだ​',
-    'チョコでも食べたら？​',
-    '桃の香りでリラックスできるらしいよ〜​',
-    'ちょっと窓から外を見てみよう！​',
-    '不機嫌の草は0カロリーだ!',
-    '君がいてくれるだけで安心するよ​',
-    'もぐもぐむしゃむしゃ​',
-    'ニガっ！！！​',
-    'おかわり欲しいな〜​',
-    'はぁ〜美味しかった!',
+    '＼ 無理しないでね​ ／',
+    '＼ 大変そうだね​ ／',
+    '＼ 僕は青じそドレッシングが好きだよ​ ／',
+    '＼ 僕はクォッカ、コアラには負けない！​ ／',
+    '＼ まだまだ食べるよ！​ ／',
+    '＼ 僕たちクォッカは "世界一幸せな動物" って呼ばれてるんだよ！ ／',
+    '＼ 美味しいものでも食べて元気出そう！​ ／',
+    '＼ 少し休んでもいいんだよ​ ／',
+    '＼ いつでも話を聞くよ​ ／',
+    '＼ いつも頑張りを見てるよ、偉いね​ ／',
+    '＼ 今日は早く帰ろうね​ ／',
+    '＼ 焦らずゆっくりで大丈夫だよ ／​',
+    '＼ 話してくれてありがとう！​ ／',
+    '＼ （たまには焼肉も食べたい）​ ／',
+    '＼ 不機嫌おいしい〜​ ／',
+    '＼ 会社来てるだけで君はなんて偉いんだ​ ／',
+    '＼ チョコでも食べたら？​ ／',
+    '＼ 桃の香りでリラックスできるらしいよ〜​ ／',
+    '＼ ちょっと窓から外を見てみよう！​ ／',
+    '＼ 不機嫌の草は0カロリーだ! ／',
+    '＼ 君がいてくれるだけで安心するよ​ ／',
+    '＼ もぐもぐむしゃむしゃ​ ／',
+    '＼ ニガっ！！！​ ／',
+    '＼ おかわり欲しいな〜 ／​',
+    '＼ はぁ〜美味しかった! ／',
   ];
 
   // メッセージを1回だけ表示するためのフラグ
@@ -346,11 +356,11 @@ class _MyHomePageState extends State<MyHomePage> {
           .get();
 
       setState(() {
-        punpunCount = punpunSnapshot.data()?['value'] ?? 0;
-        moyamoyaCount = moyamoyaSnapshot.data()?['value'] ?? 0;
-        zawazawaCount = zawazawaSnapshot.data()?['value'] ?? 0;
-        mesomesoCount = mesomesoSnapshot.data()?['value'] ?? 0;
-        awaawaCount = awaawaSnapshot.data()?['value'] ?? 0;
+        adminPunpunCount = punpunSnapshot.data()?['value'] ?? 0;
+        adminMoyamoyaCount = moyamoyaSnapshot.data()?['value'] ?? 0;
+        adminZawazawaCount = zawazawaSnapshot.data()?['value'] ?? 0;
+        adminMesomesoCount = mesomesoSnapshot.data()?['value'] ?? 0;
+        adminAwaawaCount = awaawaSnapshot.data()?['value'] ?? 0;
       });
     } catch (e) {
       print("Firestore error: $e");
@@ -384,7 +394,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final lastShownDay =
           DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
 
-      if (lastShownDay != today && now.hour >= 0) {
+      if (lastShownDay != today && now.hour >= 15) {
         // 今日まだ表示されていない場合にメッセージを表示
         setState(() {
           _showTimeMessage = "＼ リセット！リセット ／";
@@ -399,7 +409,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _backupAndDeleteCollection();
 
         // 45秒後に痩せてる画像に変更
-        Future.delayed(const Duration(seconds: 5), () {
+        Future.delayed(const Duration(seconds: 45), () {
           setState(() {
             _walkingImages = _slimImages;
           });
@@ -416,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     } else {
       // 初回アクセスの場合
-      if (now.hour >= 0) {
+      if (now.hour >= 15) {
         setState(() {
           _showTimeMessage = "＼ リセット！リセット ／";
           _walkingImages = _dietImages;
@@ -430,7 +440,7 @@ class _MyHomePageState extends State<MyHomePage> {
         _backupAndDeleteCollection();
 
         // 45秒後に元の画像リストに戻す
-        Future.delayed(const Duration(seconds: 5), () {
+        Future.delayed(const Duration(seconds: 45), () {
           setState(() {
             _walkingImages = _slimImages;
           });
@@ -448,24 +458,30 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // 15時時点のデータをバックアップして元のコレクションを削除
   void _backupAndDeleteCollection() async {
-    // バックアップコレクション名を当日の15時に固定
+    // 今日の日付のバックアップコレクション名を15時に固定
     final backupTimestamp = DateTime.now();
     final backupCollectionName =
         '${backupTimestamp.year}-${backupTimestamp.month}-${backupTimestamp.day}-15:00:00';
 
-    // コレクションがすでに存在するかチェック
+    // バックアップコレクションが存在するかチェック
     final backupCollectionSnapshot = await FirebaseFirestore.instance
         .collection(backupCollectionName)
         .limit(1)
         .get();
 
     if (backupCollectionSnapshot.docs.isNotEmpty) {
-      print('バックアップはすでに存在します。処理を終了します。');
+      print('バックアップはすでに存在します。バックアップコレクションからデータを取得します。');
+
+      // バックアップコレクションのデータを表示
+      await _fetchDataFromBackupCollection(backupCollectionName);
       return;
     }
 
+    // バックアップコレクションが存在しない場合、counterコレクションのデータを表示
+    await _fetchDataFromCounterCollection();
+
+    // counterコレクションのデータをバックアップし、削除する
     FirebaseFirestore.instance
         .collection('counter')
         .where('updatedAt',
@@ -474,15 +490,14 @@ class _MyHomePageState extends State<MyHomePage> {
         .get()
         .then((snapshot) async {
       for (DocumentSnapshot doc in snapshot.docs) {
-        // 新しいコレクションにデータとバックアップタイムスタンプを追加
+        // バックアップコレクションにデータを追加
         await FirebaseFirestore.instance
             .collection(backupCollectionName)
             .doc(doc.id)
             .set({
           'value': doc['value'],
           'updatedAt': doc['updatedAt'],
-          'backupTimestamp':
-              FieldValue.serverTimestamp(), // バックアップ実行時のタイムスタンプを保存
+          'backupTimestamp': FieldValue.serverTimestamp(),
         });
         // 元のコレクションから削除
         await doc.reference.delete();
@@ -490,6 +505,87 @@ class _MyHomePageState extends State<MyHomePage> {
       print('15時以前のデータをバックアップし、元のコレクションから削除しました');
     }).catchError((error) {
       print('バックアップ作成中または削除中にエラーが発生しました: $error');
+    });
+  }
+
+  Future<void> _fetchDataFromCounterCollection() async {
+    final punpunSnapshot = await FirebaseFirestore.instance
+        .collection('counter')
+        .doc('punpun')
+        .get();
+    final moyamoyaSnapshot = await FirebaseFirestore.instance
+        .collection('counter')
+        .doc('moyamoya')
+        .get();
+    final zawazawaSnapshot = await FirebaseFirestore.instance
+        .collection('counter')
+        .doc('zawazawa')
+        .get();
+    final mesomesoSnapshot = await FirebaseFirestore.instance
+        .collection('counter')
+        .doc('mesomeso')
+        .get();
+    final awaawaSnapshot = await FirebaseFirestore.instance
+        .collection('counter')
+        .doc('awaawa')
+        .get();
+    // 他のドキュメントも同様に取得
+    setState(() {
+      punpunCount = punpunSnapshot.data()?['value'] ?? 0;
+      moyamoyaCount = moyamoyaSnapshot.data()?['value'] ?? 0;
+      zawazawaCount = zawazawaSnapshot.data()?['value'] ?? 0;
+      mesomesoCount = mesomesoSnapshot.data()?['value'] ?? 0;
+      awaawaCount = awaawaSnapshot.data()?['value'] ?? 0;
+      _showBackupData = true; // バックアップデータをユーザー側に表示するフラグをオン
+    });
+
+    // 45秒後にバックアップデータ表示をオフ
+    Future.delayed(const Duration(seconds: 45), () {
+      setState(() {
+        _showBackupData = false; // バックアップデータをユーザー側に表示するフラグをオフ
+      });
+    });
+  }
+
+  Future<void> _fetchDataFromBackupCollection(
+      String backupCollectionName) async {
+    // backupコレクションからデータを取得し、表示
+    final punpunSnapshot = await FirebaseFirestore.instance
+        .collection(backupCollectionName)
+        .doc('punpun')
+        .get();
+    final moyamoyaSnapshot = await FirebaseFirestore.instance
+        .collection(backupCollectionName)
+        .doc('moyamoya')
+        .get();
+    final zawazawaSnapshot = await FirebaseFirestore.instance
+        .collection(backupCollectionName)
+        .doc('zawazawa')
+        .get();
+    final mesomesoSnapshot = await FirebaseFirestore.instance
+        .collection(backupCollectionName)
+        .doc('mesomeso')
+        .get();
+    final awaawaSnapshot = await FirebaseFirestore.instance
+        .collection(backupCollectionName)
+        .doc('awaawa')
+        .get();
+
+    // 他のドキュメントも同様に取得
+    setState(() {
+      punpunCount = punpunSnapshot.data()?['value'] ?? 0;
+      moyamoyaCount = moyamoyaSnapshot.data()?['value'] ?? 0;
+      zawazawaCount = zawazawaSnapshot.data()?['value'] ?? 0;
+      mesomesoCount = mesomesoSnapshot.data()?['value'] ?? 0;
+      awaawaCount = awaawaSnapshot.data()?['value'] ?? 0;
+      _showBackupData = true; // バックアップデータをユーザー側に表示するフラグをオン
+    });
+
+    // 45秒後にバックアップデータ表示をオフ
+    Future.delayed(const Duration(seconds: 45), () {
+      setState(() {
+        _showBackupData = false; // バックアップデータをユーザー側に表示するフラグをオフ
+      });
     });
   }
 
@@ -559,7 +655,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // 各カウンターを表示する行
+          // 管理者のそれぞれ各カウンターを表示する行
           Positioned(
             bottom: 110,
             left: 0,
@@ -570,7 +666,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? [
                       Column(
                         children: [
-                          Text('$punpunCount',
+                          Text('$adminPunpunCount',
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const Text('プンプン'),
@@ -578,7 +674,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       Column(
                         children: [
-                          Text('$moyamoyaCount',
+                          Text('$adminMoyamoyaCount',
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const Text('モヤモヤ'),
@@ -586,7 +682,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       Column(
                         children: [
-                          Text('$zawazawaCount',
+                          Text('$adminZawazawaCount',
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const Text('ザワザワ'),
@@ -594,7 +690,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       Column(
                         children: [
-                          Text('$mesomesoCount',
+                          Text('$adminMesomesoCount',
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const Text('メソメソ'),
@@ -602,7 +698,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       Column(
                         children: [
-                          Text('$awaawaCount',
+                          Text('$adminAwaawaCount',
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold)),
                           const Text('アワアワ'),
@@ -628,20 +724,85 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          //  15時になったら表示するメッセージ
+          // 15時になったら表示するメッセージとカウント
           if (_showTimeMessage != null)
             Positioned(
               top: 150,
               left: 0,
               right: 0,
-              child: Text(
-                _showTimeMessage!,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+              child: Column(
+                children: [
+                  Text(
+                    _showTimeMessage!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // 15時になったら45秒だけ表示するメッセージと不機嫌総数
+          if (_showBackupData)
+            Positioned(
+              top: 150,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          Text('$punpunCount',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text('プンプン'),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                        children: [
+                          Text('$moyamoyaCount',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text('モヤモヤ'),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                        children: [
+                          Text('$zawazawaCount',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text('ザワザワ'),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                        children: [
+                          Text('$mesomesoCount',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text('メソメソ'),
+                        ],
+                      ),
+                      SizedBox(width: 10),
+                      Column(
+                        children: [
+                          Text('$awaawaCount',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text('アワアワ'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
 
@@ -666,7 +827,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // クリックされたときに表示されるメッセージ
           if (_showMessageOnce && _currentMessage != null)
             Positioned(
-              top: 150,
+              top: 250,
               left: 0,
               right: 0,
               child: Text(
