@@ -56,11 +56,14 @@ class _MyHomePageState extends State<MyHomePage> {
   // バックアップを表示するかどうかのフラグ
   bool _showBackupData = false;
 
+  // 3秒後にユーザーに表示するカウントの数
+  bool _showEatingCount = false;
+
   List<Offset> _grassPositions = []; // 草の位置を保存するリスト
   List<Widget> _images = [];
   int _removedImageCount = 0; // 草を食べた回数をカウントする変数
   double _titleImageOpacity = 1.0; // 初期値を1.0に設定（表示状態）
-  String? _showTimeMessage; // 15時になったら表示するメッセージ
+  bool _isShowTimeMessage = false; //
 
   // img.pngのアニメーション用の変数
   double _imgLeftPosition = 0;
@@ -211,6 +214,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _titleImageOpacity = 0.0;
+      });
+    });
+
+    //3秒後にユーザーに表示するカウントの数
+    Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        _showEatingCount = true;
       });
     });
 
@@ -402,12 +412,12 @@ class _MyHomePageState extends State<MyHomePage> {
       final lastShownDay =
           DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
       // 15時ちょうどに表示するための処理
-      if (lastShownDay != today && now.hour == 15) {
+      if (lastShownDay != today && now.hour == 15 && now.minute == 0) {
         _showMessageForToday(today); // メッセージ表示とバックアップ処理
       }
     } else {
       // 開きっぱなしの場合の処理
-      if (now.hour == 15) {
+      if (now.hour == 15 && now.minute == 0) {
         _showMessageForToday(today); // メッセージ表示とバックアップ処理
       }
       // 15時以降に開いた場合の処理はバックアxアップのみ
@@ -465,7 +475,8 @@ class _MyHomePageState extends State<MyHomePage> {
 // 15時になった際のメッセージ表示とバックアップ処理
   void _showMessageForToday(DateTime today) {
     setState(() {
-      _showTimeMessage = "＼ リセット！リセット ／";
+      _isShowTimeMessage = true;
+      _currentMessage = "＼ リセット！リセット！ ／";
       _walkingImages = _dietImages;
       _currentWalkingImageIndex = 0; // インデックスをリセット
     });
@@ -480,13 +491,21 @@ class _MyHomePageState extends State<MyHomePage> {
     Future.delayed(const Duration(seconds: 30), () {
       setState(() {
         _walkingImages = _slimImages;
+        _currentMessage = "＼ お腹空いた〜！ ／";
       });
 
       Future.delayed(const Duration(seconds: 15), () {
         setState(() {
           _removedImageCount = 0;
           _updateWalkingImages();
-          _showTimeMessage = "＼ お腹空いた〜！ ／";
+        });
+      });
+
+      // さらに15秒後にメッセージを非表示
+      Future.delayed(const Duration(seconds: 15), () {
+        setState(() {
+          _currentMessage = "";
+          _isShowTimeMessage = false; // メッセージを非表示にする
         });
       });
     });
@@ -739,7 +758,7 @@ class _MyHomePageState extends State<MyHomePage> {
               duration: const Duration(seconds: 1), // フェードアウトの長さ
               child: Image.asset(
                 'assets/title.png',
-                height: 500,
+                height: 425,
                 width: titleImageSize,
                 fit: BoxFit.contain,
               ),
@@ -800,31 +819,32 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // 削除された画像の数を表示するテキスト
-          Positioned(
-            top: 80,
-            left: 0,
-            right: 0,
-            child: Text(
-              '食べた草の数: $_removedImageCount',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+          // 削除された画像の数を表示するテキストを3秒後に表示
+          if (_showEatingCount)
+            Positioned(
+              top: 80,
+              left: 0,
+              right: 0,
+              child: Text(
+                '食べた草の数: $_removedImageCount',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
             ),
-          ),
 
           // 15時になったら表示するメッセージとカウント
-          if (_showTimeMessage != null)
+          if (_isShowTimeMessage)
             Positioned(
-              top: 150,
+              top: 250,
               left: 0,
               right: 0,
               child: Column(
                 children: [
                   Text(
-                    _showTimeMessage!,
+                    _currentMessage!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 18,
@@ -838,7 +858,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 15時になったら45秒だけ表示するメッセージと不機嫌総数
           // 管理者以外に表示する
-          if (_showBackupData && !_isAdmin)
+          if (_showBackupData && !_isAdmin && _showEatingCount)
             Positioned(
               bottom: 110,
               left: 0,
