@@ -228,6 +228,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // 歩行アニメーションの開始
     _startWalkingAnimation();
 
+    // 15時チェックタイマーを開始
+    _startTimeCheckTimer();
+
     // ローカルストレージから15時メッセージの表示状況をチェック
     _checkLocalTimeAndSetMessage();
 
@@ -379,8 +382,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // ユーザーそれぞれで15時になったらメッセージを表示するための処理
-  // SharedPreferencesで日付を確認し、今日15時以降ならメッセージを表示
+  // 15時チェックタイマーの設定
+  void _startTimeCheckTimer() {
+    _timeCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      _checkLocalTimeAndSetMessage();
+    });
+  }
+
+  // 15時に達したか確認し、メッセージを表示する関数
   Future<void> _checkLocalTimeAndSetMessage() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -389,74 +398,156 @@ class _MyHomePageState extends State<MyHomePage> {
     String? lastShownDateStr = html.window.localStorage['lastShownDate'];
 
     if (lastShownDateStr != null) {
-      // 表示日が記録されている場合
       final lastShownDate = DateTime.parse(lastShownDateStr);
       final lastShownDay =
           DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
-
-      if (lastShownDay != today && now.hour >= 15) {
-        // 今日まだ表示されていない場合にメッセージを表示
-        setState(() {
-          _showTimeMessage = "＼ リセット！リセット ／";
-          _walkingImages = _dietImages;
-          _currentWalkingImageIndex = 0; // インデックスをリセット
-        });
-
-        // 今日の日付を保存
-        html.window.localStorage['lastShownDate'] = today.toIso8601String();
-
-        // バックアップと削除の処理をここで実行
-        _backupAndDeleteCollection();
-
-        // 45秒後に痩せてる画像に変更
-        Future.delayed(const Duration(seconds: 45), () {
-          setState(() {
-            _walkingImages = _slimImages;
-          });
-
-          // さらに15秒後にを実行
-          Future.delayed(const Duration(seconds: 15), () {
-            setState(() {
-              _removedImageCount = 0; // カウントをリセット
-              _updateWalkingImages(); // 通常の画像リストに戻す
-              _showTimeMessage = "＼ お腹空いた〜！ ／";
-            });
-          });
-        });
+      // 15時ちょうどに表示するための処理
+      if (lastShownDay != today && now.hour == 15) {
+        _showMessageForToday(today); // メッセージ表示とバックアップ処理
       }
     } else {
-      // 初回アクセスの場合
+      // 開きっぱなしの場合の処理
+      if (now.hour == 15) {
+        _showMessageForToday(today); // メッセージ表示とバックアップ処理
+      }
+      // 15時以降に開いた場合の処理はバックアxアップのみ
       if (now.hour >= 15) {
-        setState(() {
-          _showTimeMessage = "＼ リセット！リセット ／";
-          _walkingImages = _dietImages;
-          _currentWalkingImageIndex = 0; // インデックスをリセット
-        });
-
         // 今日の日付を保存
         html.window.localStorage['lastShownDate'] = today.toIso8601String();
 
-        // バックアップと削除の処理をここで実行
-        _backupAndDeleteCollection();
+        // バックアップと削除の処理を実行
+        final backupTimestamp = DateTime.now();
+        final backupCollectionName =
+            '${backupTimestamp.year}-${backupTimestamp.month}-${backupTimestamp.day}-15:00:00';
 
-        // 45秒後に元の画像リストに戻す
-        Future.delayed(const Duration(seconds: 45), () {
-          setState(() {
-            _walkingImages = _slimImages;
-          });
+        // バックアップコレクションが存在するかチェック
+        final backupCollectionSnapshot = await FirebaseFirestore.instance
+            .collection(backupCollectionName)
+            .limit(1)
+            .get();
 
-          // さらに15秒後にを実行
-          Future.delayed(const Duration(seconds: 15), () {
-            setState(() {
-              _removedImageCount = 0; // カウントをリセット
-              _updateWalkingImages(); // 通常の画像リストに戻す
-              _showTimeMessage = "＼ お腹空いた〜！ ／";
+        if (backupCollectionSnapshot.docs.isNotEmpty) {
+          print('バックアップはすでに存在します。バックアップコレクションからデータを取得します。');
+
+          // バックアップコレクションのデータを表示
+          return;
+        }
+
+        // counterコレクションのデータをバックアップし、削除する
+        FirebaseFirestore.instance
+            .collection('counter')
+            .where('updatedAt',
+                isLessThanOrEqualTo:
+                    Timestamp.fromDate(DateTime.now())) // 15時以前のデータのみ
+            .get()
+            .then((snapshot) async {
+          for (DocumentSnapshot doc in snapshot.docs) {
+            // バックアップコレクションにデータを追加
+            await FirebaseFirestore.instance
+                .collection(backupCollectionName)
+                .doc(doc.id)
+                .set({
+              'value': doc['value'],
+              'updatedAt': doc['updatedAt'],
+              'backupTimestamp': FieldValue.serverTimestamp(),
             });
-          });
+            // 元のコレクションから削除
+            await doc.reference.delete();
+          }
+          print('15時以前のデータをバックアップし、元のコレクションから削除しました');
+        }).catchError((error) {
+          print('バックアップ作成中または削除中にエラーが発生しました: $error');
         });
       }
     }
   }
+
+// 15時になった際のメッセージ表示とバックアップ処理
+  void _showMessageForToday(DateTime today) {
+    setState(() {
+      _showTimeMessage = "＼ リセット！リセット ／";
+      _walkingImages = _dietImages;
+      _currentWalkingImageIndex = 0; // インデックスをリセット
+    });
+
+    // 今日の日付を保存
+    html.window.localStorage['lastShownDate'] = today.toIso8601String();
+
+    // バックアップと削除の処理を実行
+    _backupAndDeleteCollection();
+
+    // 画像切り替えの遅延処理
+    Future.delayed(const Duration(seconds: 30), () {
+      setState(() {
+        _walkingImages = _slimImages;
+      });
+
+      Future.delayed(const Duration(seconds: 15), () {
+        setState(() {
+          _removedImageCount = 0;
+          _updateWalkingImages();
+          _showTimeMessage = "＼ お腹空いた〜！ ／";
+        });
+      });
+    });
+  }
+
+  // // ユーザーそれぞれで15時になったらメッセージを表示するための処理
+  // // SharedPreferencesで日付を確認し、今日15時ならメッセージを表示
+  // Future<void> _checkLocalTimeAndSetMessage() async {
+  //   final now = DateTime.now();
+  //   final today = DateTime(now.year, now.month, now.day);
+
+  //   // localStorageから最後に表示した日付を取得
+  //   String? lastShownDateStr = html.window.localStorage['lastShownDate'];
+
+  //   if (lastShownDateStr != null) {
+  //     // 表示日が記録されている場合
+  //     final lastShownDate = DateTime.parse(lastShownDateStr);
+  //     final lastShownDay =
+  //         DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
+
+  //     if (lastShownDay != today && now.hour == 15) {
+  //       // 今日まだ表示されていない場合にメッセージを表示
+  //       setState(() {
+  //         _showTimeMessage = "＼ リセット！リセット ／";
+  //         _walkingImages = _dietImages;
+  //         _currentWalkingImageIndex = 0; // インデックスをリセット
+  //       });
+
+  //       // 今日の日付を保存
+  //       html.window.localStorage['lastShownDate'] = today.toIso8601String();
+
+  //       // バックアップと削除の処理をここで実行
+  //       _backupAndDeleteCollection();
+
+  //       // 30秒後に痩せてる画像に変更
+  //       Future.delayed(const Duration(seconds: 30), () {
+  //         setState(() {
+  //           _walkingImages = _slimImages;
+  //         });
+
+  //         // さらに15秒後にを実行
+  //         Future.delayed(const Duration(seconds: 15), () {
+  //           setState(() {
+  //             _removedImageCount = 0; // カウントをリセット
+  //             _updateWalkingImages(); // 通常の画像リストに戻す
+  //             _showTimeMessage = "＼ お腹空いた〜！ ／";
+  //           });
+  //         });
+  //       });
+  //     }
+  //   } else {
+  //     // 初回アクセスの場合
+  //     if (now.hour >= 15) {
+  //       // 今日の日付を保存
+  //       html.window.localStorage['lastShownDate'] = today.toIso8601String();
+
+  //       // バックアップと削除の処理をここで実行
+  //       _backupAndDeleteCollection();
+  //     }
+  //   }
+  // }
 
   void _backupAndDeleteCollection() async {
     // 今日の日付のバックアップコレクション名を15時に固定
@@ -601,7 +692,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // 草を食べた後にメッセージを表示
           if (_removedImageCount > 19) {
             // 20回以上食べたらメッセージを固定
-            _currentMessage = '15時くらい運動しようかな〜';
+            _currentMessage = '15時くらいに運動しようかな〜';
             _showMessageOnce = true;
           } else {
             _currentMessage = getRandomMessage();
