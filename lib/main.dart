@@ -64,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _removedImageCount = 0; // 草を食べた回数をカウントする変数
   double _titleImageOpacity = 1.0; // 初期値を1.0に設定（表示状態）
   bool _isShowTimeMessage = false; //
+  bool _isEating = false; // 食べている状態を管理するフラグ
 
   // img.pngのアニメーション用の変数
   double _imgLeftPosition = 0;
@@ -280,39 +281,6 @@ class _MyHomePageState extends State<MyHomePage> {
         _walkingImages = _veryFatImages;
       }
       _currentWalkingImageIndex = 0; // 範囲外エラーを避けるためにインデックスをリセット
-    });
-  }
-
-  // 次の草の位置に移動する
-  void _moveImageToNextGrass() {
-    setState(() {
-      if (_grassPositions.isNotEmpty) {
-        Offset nextGrassPosition = _grassPositions[0];
-        _imgLeftPosition = nextGrassPosition.dx - 12; // 草の中央に合わせて調整
-        _imgTopPosition = nextGrassPosition.dy - 18; // 草の高さに合わせて調整
-        _isImageCentered = false;
-      }
-    });
-
-    // キャラクターが到達後に一時的に食べてる画像に変更
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        if (_removedImageCount < 3) {
-          _walkingImages = _nomalEatImages;
-        } else if (_removedImageCount < 10) {
-          _walkingImages = _slightlyFatEatImages;
-        } else if (_removedImageCount < 20) {
-          _walkingImages = _moreFatEatImages;
-        }
-        _currentWalkingImageIndex = 0;
-      });
-
-      // 1秒後に通常の歩行アニメーションに戻す
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          _updateWalkingImages(); // `_removedImageCount`に基づいてリストを更新
-        });
-      });
     });
   }
 
@@ -701,7 +669,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 草や花を削除してキャラクターを移動させるタイマー
   void _startRemovalTimer() {
-    _removalTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _removalTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
       if (_grassPositions.isNotEmpty) {
         setState(() {
           _images.removeAt(0);
@@ -723,6 +691,41 @@ class _MyHomePageState extends State<MyHomePage> {
           _moveImageToNextGrass();
         }
       }
+    });
+  }
+
+  // 次の草の位置に移動する
+  void _moveImageToNextGrass() {
+    setState(() {
+      if (_grassPositions.isNotEmpty) {
+        Offset nextGrassPosition = _grassPositions[0];
+        _imgLeftPosition = nextGrassPosition.dx - 12; // 草の中央に合わせて調整
+        _imgTopPosition = nextGrassPosition.dy - 18; // 草の高さに合わせて調整
+        _isImageCentered = false;
+      }
+    });
+
+    // キャラクターが到達後に一時的に食べてる画像に変更
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _isEating = true; // 食べている状態に設定
+        if (_removedImageCount < 3) {
+          _walkingImages = _nomalEatImages;
+        } else if (_removedImageCount < 10) {
+          _walkingImages = _slightlyFatEatImages;
+        } else if (_removedImageCount < 20) {
+          _walkingImages = _moreFatEatImages;
+        }
+        _currentWalkingImageIndex = 0;
+      });
+
+      // 1秒後に通常の歩行アニメーションに戻す
+      Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          _updateWalkingImages(); // `_removedImageCount`に基づいてリストを更新
+          _isEating = false; // 食べ終わったので食べている状態を解除
+        });
+      });
     });
   }
 
