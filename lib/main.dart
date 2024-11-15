@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<String> authorizedUuids = [
     "bb4a5169-9a03-4445-9c65-aa205fce8e34", // Prod松井
     "8f35bdd9-3ac0-430c-90a7-67918d8b3413", // local松井
-    "96c30c36-1936-4818-92d4-9c139ead2eba", // 谷上
+    "c12bbe58-4d93-4e00-ac0c-69dd7b5968f8", // 谷上
   ];
 
   // メッセージ候補リスト
