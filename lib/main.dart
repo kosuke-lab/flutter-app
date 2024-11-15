@@ -82,7 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
     "bb4a5169-9a03-4445-9c65-aa205fce8e34", // Prod松井
     "8f35bdd9-3ac0-430c-90a7-67918d8b3413", // local松井
     "c12bbe58-4d93-4e00-ac0c-69dd7b5968f8", // 谷上
-    "50e0b143-c68f-414d-9618-8d0375c07463" // 管理者
+    "50e0b143-c68f-414d-9618-8d0375c07463", // 管理者
+    "4af582e2-ce9e-48aa-bc7b-28939e030b32" // 管理者
   ];
 
   // メッセージ候補リスト
