@@ -83,7 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
     "8f35bdd9-3ac0-430c-90a7-67918d8b3413", // local松井
     "c12bbe58-4d93-4e00-ac0c-69dd7b5968f8", // 谷上
     "50e0b143-c68f-414d-9618-8d0375c07463", // 管理者
-    "4af582e2-ce9e-48aa-bc7b-28939e030b32" // 管理者
+    "4af582e2-ce9e-48aa-bc7b-28939e030b32", // 管理者
+    "dea6807c-95c9-411d-aa48-57396aa5212b" // 管理者
   ];
 
   // メッセージ候補リスト
@@ -178,28 +179,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // ハードコードされたUUIDとの一致を確認し、メッセージを表示
   Future<void> checkAndShowMessage() async {
-    String uuid = await getOrCreateUuid();
+    String? uuid = await getOrCreateUuid();
     setState(() {
       _isAdmin = authorizedUuids.contains(uuid);
     });
   }
 
   // 初回アクセス時にUUIDを生成し、localStorageとFirestoreに保存
-  Future<String> getOrCreateUuid() async {
+  Future<String?> getOrCreateUuid() async {
     const uuidKey = 'flutter_web_unique_id';
     var storedUuid = html.window.localStorage[uuidKey];
 
-    if (storedUuid == null) {
-      // UUIDを生成し、localStorageとFirestoreに保存
-      storedUuid = Uuid().v4();
-      html.window.localStorage[uuidKey] = storedUuid;
-      await FirebaseFirestore.instance
-          .collection('userUuids')
-          .doc(storedUuid)
-          .set({
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    }
+    // 管理者の締め切り
+    // if (storedUuid == null) {
+    //   // UUIDを生成し、localStorageとFirestoreに保存
+    //   storedUuid = Uuid().v4();
+    //   html.window.localStorage[uuidKey] = storedUuid;
+    //   await FirebaseFirestore.instance
+    //       .collection('userUuids')
+    //       .doc(storedUuid)
+    //       .set({
+    //     'createdAt': FieldValue.serverTimestamp(),
+    //   });
+    // }
 
     return storedUuid;
   }
