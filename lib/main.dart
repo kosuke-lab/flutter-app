@@ -55,6 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // バックアップを表示するかどうかのフラグ
   bool _showBackupData = false;
+  // 縄跳びの時の背景画像を表示するかどうかのフラグ
+  bool _isDarkHaikei = false;
 
   // 3秒後にユーザーに表示するカウントの数
   bool _showEatingCount = false;
@@ -415,7 +417,7 @@ class _MyHomePageState extends State<MyHomePage> {
           return;
         }
 
-        // counterコレクションのデータをバックアップし、削除する
+        //counterコレクションのデータをバックアップし、削除する
         FirebaseFirestore.instance
             .collection('counter')
             .where('updatedAt',
@@ -447,6 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
 // 15時になった際のメッセージ表示とバックアップ処理
   void _showMessageForToday(DateTime today) {
     setState(() {
+      _isDarkHaikei = true;
       _isShowTimeMessage = true;
       _currentMessage = "＼ リセット！リセット！ ／";
       _walkingImages = _dietImages;
@@ -462,6 +465,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // 画像切り替えの遅延処理 15分後に痩せてる画像に変更
     Future.delayed(const Duration(minutes: 15), () {
       setState(() {
+        _isDarkHaikei = false;
         _walkingImages = _slimImages;
         _currentMessage = "＼ お腹空いた〜！ ／";
       });
@@ -750,7 +754,9 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           // 背景画像
           Positioned.fill(
-            child: Image.asset('assets/haikei.png', fit: BoxFit.cover),
+            child: _isDarkHaikei
+                ? Image.asset('assets/dark_haikei.jpg', fit: BoxFit.cover)
+                : Image.asset('assets/haikei.png', fit: BoxFit.cover),
           ),
 
           Align(
@@ -776,46 +782,52 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: _isAdmin
                   ? [
-                      Column(
-                        children: [
-                          Text('$adminPunpunCount',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Text('プンプン'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text('$adminMoyamoyaCount',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Text('モヤモヤ'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text('$adminZawazawaCount',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Text('ザワザワ'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text('$adminMesomesoCount',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Text('メソメソ'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text('$adminAwaawaCount',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Text('アワアワ'),
-                        ],
-                      ),
+                      DefaultTextStyle(
+                        style: TextStyle(
+                          color: _isDarkHaikei ? Colors.white : Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                Text('$punpunCount'),
+                                Text('プンプン'),
+                              ],
+                            ),
+                            SizedBox(width: 10),
+                            Column(
+                              children: [
+                                Text('$moyamoyaCount'),
+                                Text('モヤモヤ'),
+                              ],
+                            ),
+                            SizedBox(width: 10),
+                            Column(
+                              children: [
+                                Text('$zawazawaCount'),
+                                Text('ザワザワ'),
+                              ],
+                            ),
+                            SizedBox(width: 10),
+                            Column(
+                              children: [
+                                Text('$mesomesoCount'),
+                                Text('メソメソ'),
+                              ],
+                            ),
+                            SizedBox(width: 10),
+                            Column(
+                              children: [
+                                Text('$awaawaCount'),
+                                Text('アワアワ'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
                     ]
                   : [],
             ),
@@ -824,7 +836,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // 削除された画像の数を表示するテキストを3秒後に表示
           if (_showEatingCount)
             Positioned(
-              top: 80,
+              top: 140,
               left: 0,
               right: 0,
               child: Text(
@@ -840,7 +852,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // 15時になったら表示するメッセージとカウント
           if (_isShowTimeMessage)
             Positioned(
-              top: 250,
+              top: 400,
               left: 0,
               right: 0,
               child: Column(
@@ -851,7 +863,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: _isDarkHaikei ? Colors.white : Colors.black,
                     ),
                   ),
                 ],
@@ -874,8 +886,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text('$punpunCount',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Text('プンプン'),
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text('プンプン',
+                              style: TextStyle(
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                       SizedBox(width: 10),
@@ -883,8 +905,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text('$moyamoyaCount',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Text('モヤモヤ'),
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text('モヤモヤ',
+                              style: TextStyle(
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                       SizedBox(width: 10),
@@ -892,8 +924,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text('$zawazawaCount',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Text('ザワザワ'),
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text('ザワザワ',
+                              style: TextStyle(
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                       SizedBox(width: 10),
@@ -901,8 +943,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text('$mesomesoCount',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Text('メソメソ'),
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text('メソメソ',
+                              style: TextStyle(
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                       SizedBox(width: 10),
@@ -910,8 +962,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text('$awaawaCount',
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Text('アワアワ'),
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text('アワアワ',
+                              style: TextStyle(
+                                  color: _isDarkHaikei
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ],
@@ -941,7 +1003,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // クリックされたときに表示されるメッセージ
           if (_showMessageOnce && _currentMessage != null)
             Positioned(
-              top: 250,
+              top: 400,
               left: 0,
               right: 0,
               child: Text(
@@ -950,7 +1012,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: _isDarkHaikei ? Colors.white : Colors.black,
                 ),
               ),
             ),

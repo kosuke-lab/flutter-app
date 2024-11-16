@@ -64,6 +64,7 @@ flutter:
   assets:
     - assets/background.jpg
     - assets/haikei.png
+    - assets/dark_haikei.jpg
     - assets/punpun.png
     - assets/pun-kusa.png
     - assets/moyamoya.png
