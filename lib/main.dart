@@ -459,23 +459,18 @@ class _MyHomePageState extends State<MyHomePage> {
     // バックアップと削除の処理を実行
     _backupAndDeleteCollection();
 
-    // 画像切り替えの遅延処理
-    Future.delayed(const Duration(seconds: 30), () {
+    // 画像切り替えの遅延処理 15分後に痩せてる画像に変更
+    Future.delayed(const Duration(minutes: 15), () {
       setState(() {
         _walkingImages = _slimImages;
         _currentMessage = "＼ お腹空いた〜！ ／";
       });
 
-      Future.delayed(const Duration(seconds: 15), () {
+      // さらに1分後に元に戻す
+      Future.delayed(const Duration(minutes: 1), () {
         setState(() {
           _removedImageCount = 0;
           _updateWalkingImages();
-        });
-      });
-
-      // さらに15秒後にメッセージを非表示
-      Future.delayed(const Duration(seconds: 15), () {
-        setState(() {
           _currentMessage = "";
           _isShowTimeMessage = false; // メッセージを非表示にする
         });
