@@ -52428,7 +52428,9 @@ g=window.localStorage.getItem("lastShownDate")
 s=g!=null?3:5
 break
 case 3:o=A.aid(g)
-if(!A.a8W(A.i7(o),A.nk(o),A.nj(o)).j(0,h)&&A.t0(i)===15&&A.VL(i)===0)p.B3(h)
+n=!1
+if(!A.a8W(A.i7(o),A.nk(o),A.nj(o)).j(0,h))if(A.t0(i)===15)n=A.VL(i)<15
+if(n)p.B3(h)
 s=4
 break
 case 5:if(A.t0(i)===15&&A.VL(i)===0)p.B3(h)
