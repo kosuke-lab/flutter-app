@@ -86,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
     "c12bbe58-4d93-4e00-ac0c-69dd7b5968f8", // 谷上
     "50e0b143-c68f-414d-9618-8d0375c07463", // 管理者
     "4af582e2-ce9e-48aa-bc7b-28939e030b32", // 管理者
+    "dea6807c-95c9-411d-aa48-57396aa5212b" // 管理者
   ];
 
   // メッセージ候補リスト
