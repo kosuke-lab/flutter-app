@@ -385,8 +385,11 @@ class _MyHomePageState extends State<MyHomePage> {
       final lastShownDate = DateTime.parse(lastShownDateStr);
       final lastShownDay =
           DateTime(lastShownDate.year, lastShownDate.month, lastShownDate.day);
-      // 15時ちょうどに表示するための処理
-      if (lastShownDay != today && now.hour == 15 && now.minute == 0) {
+      // 15時ちょうどから15分の間に表示するための処理
+      if (lastShownDay != today &&
+          now.hour == 15 &&
+          now.minute >= 0 &&
+          now.minute < 15) {
         _showMessageForToday(today); // メッセージ表示とバックアップ処理
       }
     } else {
