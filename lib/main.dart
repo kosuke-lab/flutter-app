@@ -86,7 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
     "c12bbe58-4d93-4e00-ac0c-69dd7b5968f8", // 谷上
     "50e0b143-c68f-414d-9618-8d0375c07463", // 管理者
     "4af582e2-ce9e-48aa-bc7b-28939e030b32", // 管理者
-    "dea6807c-95c9-411d-aa48-57396aa5212b" // 管理者
   ];
 
   // メッセージ候補リスト
@@ -793,35 +792,35 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: [
                             Column(
                               children: [
-                                Text('$punpunCount'),
+                                Text('$adminPunpunCount'),
                                 Text('プンプン'),
                               ],
                             ),
                             SizedBox(width: 10),
                             Column(
                               children: [
-                                Text('$moyamoyaCount'),
+                                Text('$adminMoyamoyaCount'),
                                 Text('モヤモヤ'),
                               ],
                             ),
                             SizedBox(width: 10),
                             Column(
                               children: [
-                                Text('$zawazawaCount'),
+                                Text('$adminZawazawaCount'),
                                 Text('ザワザワ'),
                               ],
                             ),
                             SizedBox(width: 10),
                             Column(
                               children: [
-                                Text('$mesomesoCount'),
+                                Text('$adminMesomesoCount'),
                                 Text('メソメソ'),
                               ],
                             ),
                             SizedBox(width: 10),
                             Column(
                               children: [
-                                Text('$awaawaCount'),
+                                Text('$adminAwaawaCount'),
                                 Text('アワアワ'),
                               ],
                             ),
