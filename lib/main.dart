@@ -368,7 +368,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // 15時チェックタイマーの設定
   void _startTimeCheckTimer() {
-    _timeCheckTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+    _timeCheckTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
       _checkLocalTimeAndSetMessage();
     });
   }
@@ -397,7 +397,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (now.hour == 15 && now.minute == 0) {
         _showMessageForToday(today); // メッセージ表示とバックアップ処理
       }
-      // 15時以降に開いた場合の処理はバックアxアップのみ
+      // 15時以降に開いた場合の処理はバックアップのみ
       if (now.hour >= 15) {
         // 今日の日付を保存
         html.window.localStorage['lastShownDate'] = today.toIso8601String();
@@ -855,7 +855,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // 15時になったら表示するメッセージとカウント
           if (_isShowTimeMessage)
             Positioned(
-              top: 400,
+              top: MediaQuery.of(context).size.height * 0.55, // 画面の高さの55%に設定
               left: 0,
               right: 0,
               child: Column(
@@ -1006,7 +1006,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // クリックされたときに表示されるメッセージ
           if (_showMessageOnce && _currentMessage != null)
             Positioned(
-              top: 400,
+              top: MediaQuery.of(context).size.height * 0.55, // 画面の高さの55%に設定
               left: 0,
               right: 0,
               child: Text(
@@ -1118,7 +1118,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
 
-      double randomTop = (screenHeight * 0.55) +
+      double randomTop = (screenHeight * 0.60) +
           _random.nextDouble() * (screenHeight * 0.3 - 50);
       double randomLeft = _random.nextDouble() * (screenWidth - 50);
 
