@@ -1022,7 +1022,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           // 草や花を追加するためのボタン
           Positioned(
-            bottom: 30,
+            bottom: MediaQuery.of(context).size.height * 0.02,
             left: 0,
             right: 0,
             child: Row(
@@ -1118,8 +1118,10 @@ class _MyHomePageState extends State<MyHomePage> {
       final screenHeight = MediaQuery.of(context).size.height;
       final screenWidth = MediaQuery.of(context).size.width;
 
-      double randomTop = (screenHeight * 0.60) +
-          _random.nextDouble() * (screenHeight * 0.3 - 50);
+      double minTop = screenHeight * 0.58;
+      double maxTop = screenHeight * 0.9 - 80;
+
+      double randomTop = minTop + _random.nextDouble() * (maxTop - minTop);
       double randomLeft = _random.nextDouble() * (screenWidth - 50);
 
       Offset newGrassPosition = Offset(randomLeft, randomTop);
