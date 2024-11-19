@@ -465,25 +465,80 @@ class _MyHomePageState extends State<MyHomePage> {
     // バックアップと削除の処理を実行
     _backupAndDeleteCollection();
 
-    // 画像切り替えの遅延処理 15分後に痩せてる画像に変更
-    Future.delayed(const Duration(minutes: 15), () {
-      setState(() {
-        _isDarkHaikei = false;
-        _walkingImages = _slimImages;
-        _currentMessage = "＼ お腹空いた〜！ ／";
-      });
+    DateTime now = DateTime.now();
+    DateTime fifteenFifteen = DateTime(
+        now.year, now.month, now.day, 15, 15); // 縄跳びの画像の最終(これ以降はスリムの画像)
+    DateTime fifteenThirty = DateTime(
+        now.year, now.month, now.day, 15, 30); // スリムの画像の最終時間(これ以降は普通の画像)
 
-      // さらに1分後に元に戻す
-      Future.delayed(const Duration(minutes: 1), () {
-        setState(() {
-          _removedImageCount = 0;
-          _updateWalkingImages();
-          _currentMessage = "";
-          _isShowTimeMessage = false; // メッセージを非表示にする
+    // 現在時刻が15:15より前の場合、残り時間を計算して設定
+    if (now.isBefore(fifteenFifteen)) {
+      Future.delayed(fifteenFifteen.difference(now), () {
+        // 15:30になったら通常状態に戻す
+        Future.delayed(fifteenThirty.difference(DateTime.now()), () {
+          setState(() {
+            _removedImageCount = 0; // 草を食べた数をリセット
+            _updateWalkingImages(); // 通常のイメージに戻す
+            _currentMessage = ""; // メッセージを非表示にする
+            _isShowTimeMessage = false; // メッセージフラグをオフ
+          });
         });
       });
-    });
+    } else if (now.isBefore(fifteenThirty)) {
+      // 現在時刻が15:15〜15:30の場合、slim状態に直接切り替え
+      setState(() {
+        _isDarkHaikei = false;
+        _walkingImages = _slimImages; // slimイメージに変更
+        _currentMessage = ""; // メッセージを空にする
+      });
+
+      // 15:30になったら通常状態に戻す
+      Future.delayed(fifteenThirty.difference(now), () {
+        setState(() {
+          _removedImageCount = 0; // 草を食べた数をリセット
+          _updateWalkingImages(); // 通常のイメージに戻す
+          _currentMessage = ""; // メッセージを非表示にする
+          _isShowTimeMessage = false; // メッセージフラグをオフ
+        });
+      });
+    }
   }
+
+// // 15時になった際のメッセージ表示とバックアップ処理
+//   void _showMessageForToday(DateTime today) {
+//     setState(() {
+//       _isDarkHaikei = true;
+//       _isShowTimeMessage = true;
+//       _currentMessage = "＼ リセット！リセット！ ／";
+//       _walkingImages = _dietImages;
+//       _currentWalkingImageIndex = 0; // インデックスをリセット
+//     });
+
+//     // 今日の日付を保存
+//     html.window.localStorage['lastShownDate'] = today.toIso8601String();
+
+//     // バックアップと削除の処理を実行
+//     _backupAndDeleteCollection();
+
+//     // 画像切り替えの遅延処理 15分後に痩せてる画像に変更
+//     Future.delayed(const Duration(minutes: 15), () {
+//       setState(() {
+//         _isDarkHaikei = false;
+//         _walkingImages = _slimImages;
+//         _currentMessage = "＼ お腹空いた〜！ ／";
+//       });
+
+//       // さらに1分後に元に戻す
+//       Future.delayed(const Duration(minutes: 1), () {
+//         setState(() {
+//           _removedImageCount = 0;
+//           _updateWalkingImages();
+//           _currentMessage = "";
+//           _isShowTimeMessage = false; // メッセージを非表示にする
+//         });
+//       });
+//     });
+//   }
 
   // // ユーザーそれぞれで15時になったらメッセージを表示するための処理
   // // SharedPreferencesで日付を確認し、今日15時ならメッセージを表示
