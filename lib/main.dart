@@ -465,43 +465,50 @@ class _MyHomePageState extends State<MyHomePage> {
     // バックアップと削除の処理を実行
     _backupAndDeleteCollection();
 
-    DateTime now = DateTime.now();
-    DateTime fifteenFifteen = DateTime(
-        now.year, now.month, now.day, 15, 15); // 縄跳びの画像の最終(これ以降はスリムの画像)
-    DateTime fifteenThirty = DateTime(
-        now.year, now.month, now.day, 15, 30); // スリムの画像の最終時間(これ以降は普通の画像)
+    final now = DateTime.now();
+    final fifteenFifteen = DateTime(now.year, now.month, now.day, 15, 15);
+    final fifteenThirty = DateTime(now.year, now.month, now.day, 15, 30);
 
-    // 現在時刻が15:15より前の場合、残り時間を計算して設定
     if (now.isBefore(fifteenFifteen)) {
+      // 15:15前ならダイエット画像に変更
       Future.delayed(fifteenFifteen.difference(now), () {
-        // 15:30になったら通常状態に戻す
+        setState(() {
+          _isDarkHaikei = false;
+          _walkingImages = _slimImages;
+          _currentMessage = "＼ お腹空いた〜！ ／";
+        });
+
+        // 15:30に通常の画像へ戻す
         Future.delayed(fifteenThirty.difference(DateTime.now()), () {
-          setState(() {
-            _removedImageCount = 0; // 草を食べた数をリセット
-            _updateWalkingImages(); // 通常のイメージに戻す
-            _currentMessage = ""; // メッセージを非表示にする
-            _isShowTimeMessage = false; // メッセージフラグをオフ
-          });
+          _resetWalkingImages();
         });
       });
     } else if (now.isBefore(fifteenThirty)) {
-      // 現在時刻が15:15〜15:30の場合、slim状態に直接切り替え
+      // 15:15〜15:30の間ならすぐにslim画像を表示
       setState(() {
         _isDarkHaikei = false;
-        _walkingImages = _slimImages; // slimイメージに変更
-        _currentMessage = ""; // メッセージを空にする
+        _walkingImages = _slimImages;
+        _currentMessage = "＼ お腹空いた〜！ ／";
       });
 
-      // 15:30になったら通常状態に戻す
+      // 15:30に通常の画像へ戻す
       Future.delayed(fifteenThirty.difference(now), () {
-        setState(() {
-          _removedImageCount = 0; // 草を食べた数をリセット
-          _updateWalkingImages(); // 通常のイメージに戻す
-          _currentMessage = ""; // メッセージを非表示にする
-          _isShowTimeMessage = false; // メッセージフラグをオフ
-        });
+        _resetWalkingImages();
       });
+    } else {
+      // 15:30以降は通常状態に戻す
+      _resetWalkingImages();
     }
+  }
+
+// 画像をリセットする共通メソッド
+  void _resetWalkingImages() {
+    setState(() {
+      _removedImageCount = 0; // 草を食べた数をリセット
+      _updateWalkingImages(); // 通常のイメージに戻す
+      _currentMessage = ""; // メッセージを非表示にする
+      _isShowTimeMessage = false; // メッセージフラグをオフ
+    });
   }
 
 // // 15時になった際のメッセージ表示とバックアップ処理
